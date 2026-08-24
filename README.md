@@ -47,6 +47,7 @@ unrelated commits that all touched monster AI would get one toggle, not three.
 | Toggle | What it covers | What it does |
 | --- | --- | --- |
 | **Post-4.2.6 tile assignments** (`catchup.tiles`) | 4 upstream commits, March 2026 | Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as coloured letters. In every case the art was already in the sheet and only the line pointing at it was missing. Each block applies to the tile set upstream wrote it for and to no other, and only where that set assigns nothing already, so no picture anybody drew is replaced. None of it is visible in ASCII. |
+| **Post-4.2.6 text corrections** (`catchup.text`) | 1 upstream commit, July 2026 | Wording upstream corrected after the 4.2.6 tag. Today: the Trident 'of Wrath' description spells the Maia's name "Ossë" instead of 4.2.6's "Osse" (commit `f1b1626f6`). Text only; no damage, weight or slot changes. |
 
 Every toggle defaults to **off**, which is not what the `bug-fixes` mod does and
 is deliberate: core is 4.2.6, a player who installed the game did not ask for
@@ -67,10 +68,26 @@ the whole of the list below.
 | [`9b04b692d`](https://github.com/angband/angband/commit/9b04b692d) | 2026-03-18 | Tiles for the Sip of Miruvor and the Draught of the Ents, both previously commented out | Nomad's tiles (`nomad/graf-nmd.prf`) | Yes, under `catchup.tiles` |
 | [`655812a54`](https://github.com/angband/angband/commit/655812a54) | 2026-03-20 | Eight assignments for art the sheet already carried and nothing pointed at: the Sip of Miruvor, the old forest tree, the witch, the blackguard, Old Man Willow, the red-hatted elf, Father Christmas, and the dúnadan of Angmar | Adam Bolt's tiles (`adam-bolt/graf-new.prf`) | Yes, under `catchup.tiles` |
 | [`ab2d65386`](https://github.com/angband/angband/commit/ab2d65386) | 2026-03-24 | Removed a stale comment about numeric SVALs from two Shockbolt pref files | Shockbolt Dark and Light | **No port needed.** The commit deletes two comment lines and changes no assignment. A stub for it would be a row claiming work that does not exist. |
+| [`f1b1626f6`](https://github.com/angband/angband/commit/f1b1626f6) | 2026-07-26 | Corrected the spelling of Ossë in the Trident 'of Wrath' description | n/a (gamedata text, not a tile) | Yes, under `catchup.text` |
 
-The remaining 156 commits are somebody else's job or nobody's: build, CI and
-platform plumbing, comments, casts, and text or data corrections that are the
-`bug-fixes` mod's to carry because upstream has not accepted a fix for them.
+The remaining commits are somebody else's job or nobody's: build, CI and
+platform plumbing, comments, casts. A text or data correction is the
+`bug-fixes` mod's to carry ONLY when upstream has not accepted a fix for it;
+once upstream does, it belongs here, cited by SHA - `f1b1626f6` above shipped
+briefly in `bug-fixes` 0.19.0 before being redirected here in 0.19.1/0.1.1 for
+exactly that reason.
+
+### A known interaction with the `bug-fixes` mod
+
+`bug-fixes` independently rewrites the Trident 'of Wrath' description for an
+unrelated reason (dropping an obsolete two-handed-weapon clause 4.2.6's text
+still carries). Both mods patch the same field. This mod's patch is written
+against 4.2.6's own baseline wording, not against `bug-fixes`' rewritten
+version, since neither mod can assume the other is installed. With both mods
+enabled, whichever patch composes last for that field wins entirely for it -
+the two do not merge. If you run both, expect either the corrected spelling
+or the corrected two-handed clause for this one description, not both, until
+the composition order is something you have checked.
 
 ### The assignments themselves
 

@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "catchup-text": {
+      "patches": {
+        "core:of-wrath": {
+          "desc": [
+            "A massive triple-pronged spear, so great it normally requires two hands",
+            " to wield, evoking the spirit of Ossë who with it pierced legions of",
+            " evil and undead."
+          ]
+        }
+      }
+    }
+  }
+}

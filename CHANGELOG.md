@@ -12,6 +12,18 @@ Every entry cites the upstream Angband commit it carries, because that citation
 is what decides membership: a change with an accepted upstream commit belongs
 here, and one without belongs to the `bug-fixes` mod.
 
+## 0.1.1 - 2026-08-24
+
+### Added
+
+- **Post-4.2.6 text corrections (`catchup.text`, off by default).** The
+  Trident 'of Wrath' description now spells the Maia's name "Ossë" instead
+  of 4.2.6's "Osse", matching upstream commit
+  [`f1b1626f6`](https://github.com/angband/angband/commit/f1b1626f6)
+  (2026-07-26). This shipped briefly in `neo-angband-mod-bug-fixes` 0.19.0
+  and was retracted there in 0.19.1: an accepted upstream commit belongs
+  here, not in `bug-fixes`.
+
 ## 0.1.0 - 2026-08-24
 
 First release.
