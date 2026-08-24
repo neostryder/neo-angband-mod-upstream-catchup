@@ -30,6 +30,15 @@ here, and one without belongs to the `bug-fixes` mod.
   Needs the engine release that added the `shapeLearnObviousFlagsDirectly`
   seam; on an older engine the rule is inert and the rest of the mod is
   unaffected.
+- **Post-4.2.6 restored-level tracking (`catchup.levelRevisitTracking`, off by
+  default).** On return to a persistent level or after single combat, discard
+  the former player-noise field and age the old scent trail for the world ticks
+  spent away. This matches upstream commit
+  [`5c45eb958`](https://github.com/angband/angband/commit/5c45eb9588b8227d4f1b1998e0a627ad7ee11a75)
+  (2026-08-18), the level-revisit half of the noise portion of upstream issue
+  [#4605](https://github.com/angband/angband/issues/4605). It is intentionally
+  separate from `bug-fixes`' heatmap save/reload preservation: the two handle
+  different lifecycle events and make opposite choices for the old fields.
 
 ## 0.1.2 - 2026-08-24
 

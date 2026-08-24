@@ -57,6 +57,7 @@ import {
 } from "./tiles";
 import { clampBlastRadius } from "./radius";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
+import { refreshRevisitedTracking } from "./tracking";
 
 /**
  * What this plugin needs from the host's context, structurally. Declared here
@@ -91,6 +92,17 @@ interface CatchupHooks {
    * flags are learned directly, on top of the existing equipment-based path.
    */
   shapeLearnObviousFlagsDirectly?: () => boolean;
+  /** ModHooks.levelRevisited: transient tracking after a frozen level returns. */
+  levelRevisited?: (
+    chunk: {
+      readonly width: number;
+      readonly height: number;
+      readonly noise: Uint16Array;
+      readonly scent: Uint16Array;
+    },
+    frozenAt: number,
+    now: number,
+  ) => void;
 }
 
 export default {
@@ -131,6 +143,19 @@ export default {
      */
     if (ctx.flags["catchup.shapeFlags"] === true) {
       out.shapeLearnObviousFlagsDirectly = learnShapeObviousFlagsDirectly;
+    }
+
+    /*
+     * catchup.levelRevisitTracking - upstream 5c45eb9588's second behaviour,
+     * separate from its save/reload noise reconstruction.  A resumed level's
+     * old flow still points at the player location from before they left, and
+     * its scent has stood still.  Upstream clears that noise and fast-forwards
+     * the scent by elapsed world ticks, for persistent levels and a return from
+     * single combat.  This needs the engine's levelRevisited notification; on
+     * an older engine the extra key is inert.
+     */
+    if (ctx.flags["catchup.levelRevisitTracking"] === true) {
+      out.levelRevisited = refreshRevisitedTracking;
     }
 
     return out;

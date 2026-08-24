@@ -66,6 +66,25 @@ function learnShapeObviousFlagsDirectly() {
   return true;
 }
 
+// tracking.ts
+function refreshRevisitedTracking(chunk, frozenAt, now) {
+  const increment = Math.trunc(now / 10) - Math.trunc(frozenAt / 10);
+  for (let y = 1; y < chunk.height - 1; y++) {
+    for (let x = 1; x < chunk.width - 1; x++) {
+      const i = y * chunk.width + x;
+      const scent = chunk.scent[i] ?? 0;
+      if (scent > 0) {
+        if (increment <= 65535 && scent <= 65535 - increment) {
+          chunk.scent[i] = scent + increment;
+        } else {
+          chunk.scent[i] = 0;
+        }
+      }
+      chunk.noise[i] = 0;
+    }
+  }
+}
+
 // plugin.ts
 var plugin_default = {
   api: 1,
@@ -87,6 +106,9 @@ var plugin_default = {
     }
     if (ctx.flags["catchup.shapeFlags"] === true) {
       out.shapeLearnObviousFlagsDirectly = learnShapeObviousFlagsDirectly;
+    }
+    if (ctx.flags["catchup.levelRevisitTracking"] === true) {
+      out.levelRevisited = refreshRevisitedTracking;
     }
     return out;
   },

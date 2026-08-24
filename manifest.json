@@ -8,11 +8,11 @@
     "plugin"
   ],
   "modApi": 1,
-  "affectsGameplay": false,
+  "affectsGameplay": true,
   "capabilities": [
     "registry:tiles"
   ],
-  "engine": ">=0.23.0",
+  "engine": ">=0.34.0",
   "dependencies": {
     "core": "*"
   },
@@ -36,6 +36,12 @@
       "flag": "catchup.shapeFlags",
       "title": "Post-4.2.6 shapechange flag learning",
       "description": "A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but you are never told, because the game only ever checked your equipment. This teaches you exactly the same obvious flags the shape already reveals on assuming it, not anything else about the shape; it does not reveal a resistance or a flag you would still have to experience in play to learn. Needs the engine release that added the shape-flag-learning seam; on an older engine this row is inert.",
+      "default": false
+    },
+    {
+      "flag": "catchup.levelRevisitTracking",
+      "title": "Post-4.2.6 restored-level tracking",
+      "description": "When returning to a persistent level or leaving single combat, discard the old noise field and age the old scent trail by the world ticks spent away. This matches upstream commit 5c45eb958 (2026-08-18), which fixed the stale tracking state after a level revisit. The next normal world tick builds fresh noise and lays fresh scent from the player's new position. This is deliberately separate from bug-fixes' save/reload heatmap persistence: that fix preserves an interrupted in-play level; this one makes an out-of-play level resume as upstream now does. Needs the engine release that added the level-revisited seam; on an older engine this row is inert.",
       "default": false
     }
   ],
