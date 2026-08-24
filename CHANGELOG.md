@@ -12,6 +12,25 @@ Every entry cites the upstream Angband commit it carries, because that citation
 is what decides membership: a change with an accepted upstream commit belongs
 here, and one without belongs to the `bug-fixes` mod.
 
+## 0.1.2 - 2026-08-24
+
+### Added
+
+- **Post-4.2.6 projection corrections (`catchup.projections`, off by default).**
+  A blast radius larger than the game's maximum projection range is now held at
+  that maximum, matching upstream commit
+  [`f0f6bd223`](https://github.com/angband/angband/commit/f0f6bd223b6b9faf0072b0ae7ffb34a812b97349)
+  (2026-07-28), which closed upstream issue
+  [#6671](https://github.com/angband/angband/issues/6671). Without it a blast
+  reaches distances its own damage table has no entry for, and every grid out
+  there is dealt a damage that is not a number at all. A radius already within
+  range is left exactly as it was, so switching the rule on changes nothing any
+  4.2.6 spell, breath, wand or trap can ask for - only another mod, or the debug
+  command, reaches the case this covers. This is the mod's first rule that
+  changes engine behaviour rather than content, and it needs the engine release
+  that added the projection-radius seam; on an older engine the rule is inert
+  and the rest of the mod is unaffected.
+
 ## 0.1.1 - 2026-08-24
 
 ### Added

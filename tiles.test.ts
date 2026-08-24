@@ -407,8 +407,11 @@ describe("manifest.json", () => {
     expect(() => validateManifest(manifest)).not.toThrow();
   });
 
-  it("declares the one flag the plugin reads, and defaults it off", () => {
-    expect(manifest.rules.map((r) => r.flag)).toEqual(["catchup.tiles"]);
+  it("declares the flags the plugin reads, and defaults every one of them off", () => {
+    expect(manifest.rules.map((r) => r.flag)).toEqual([
+      "catchup.tiles",
+      "catchup.projections",
+    ]);
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);
   });
 

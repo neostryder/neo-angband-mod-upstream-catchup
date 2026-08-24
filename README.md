@@ -48,6 +48,7 @@ unrelated commits that all touched monster AI would get one toggle, not three.
 | --- | --- | --- |
 | **Post-4.2.6 tile assignments** (`catchup.tiles`) | 4 upstream commits, March 2026 | Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as coloured letters. In every case the art was already in the sheet and only the line pointing at it was missing. Each block applies to the tile set upstream wrote it for and to no other, and only where that set assigns nothing already, so no picture anybody drew is replaced. None of it is visible in ASCII. |
 | **Post-4.2.6 text corrections** (`catchup.text`) | 1 upstream commit, July 2026 | Wording upstream corrected after the 4.2.6 tag. Today: the Trident 'of Wrath' description spells the Maia's name "Ossë" instead of 4.2.6's "Osse" (commit `f1b1626f6`). Text only; no damage, weight or slot changes. |
+| **Post-4.2.6 projection corrections** (`catchup.projections`) | 1 upstream commit, July 2026 | Corrections to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (commit `f0f6bd223`, upstream issue [#6671](https://github.com/angband/angband/issues/6671)). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, reaches the case this covers. Needs the engine release that added the projection-radius seam; on an older engine the row is inert. |
 
 Every toggle defaults to **off**, which is not what the `bug-fixes` mod does and
 is deliberate: core is 4.2.6, a player who installed the game did not ask for
@@ -69,9 +70,10 @@ the whole of the list below.
 | [`655812a54`](https://github.com/angband/angband/commit/655812a54) | 2026-03-20 | Eight assignments for art the sheet already carried and nothing pointed at: the Sip of Miruvor, the old forest tree, the witch, the blackguard, Old Man Willow, the red-hatted elf, Father Christmas, and the dúnadan of Angmar | Adam Bolt's tiles (`adam-bolt/graf-new.prf`) | Yes, under `catchup.tiles` |
 | [`ab2d65386`](https://github.com/angband/angband/commit/ab2d65386) | 2026-03-24 | Removed a stale comment about numeric SVALs from two Shockbolt pref files | Shockbolt Dark and Light | **No port needed.** The commit deletes two comment lines and changes no assignment. A stub for it would be a row claiming work that does not exist. |
 | [`f1b1626f6`](https://github.com/angband/angband/commit/f1b1626f6) | 2026-07-26 | Corrected the spelling of Ossë in the Trident 'of Wrath' description | n/a (gamedata text, not a tile) | Yes, under `catchup.text` |
+| [`f0f6bd223`](https://github.com/angband/angband/commit/f0f6bd223b6b9faf0072b0ae7ffb34a812b97349) | 2026-07-28 | Held a blast radius inside the maximum projection range, resolving upstream issue [#6671](https://github.com/angband/angband/issues/6671) | n/a (`src/project.c`, not a tile) | Yes, under `catchup.projections` |
 
 The remaining commits are somebody else's job or nobody's: build, CI and
-platform plumbing, comments, casts. A text or data correction is the
+platform plumbing, comments, casts. A text, data or behaviour correction is the
 `bug-fixes` mod's to carry ONLY when upstream has not accepted a fix for it;
 once upstream does, it belongs here, cited by SHA - `f1b1626f6` above shipped
 briefly in `bug-fixes` 0.19.0 before being redirected here in 0.19.1/0.1.1 for
@@ -96,6 +98,14 @@ grammar, and the engine's own port of that grammar is what reads them. So a name
 resolves exactly as it resolves for a tile pack's own `graf-*.prf`, and a line
 that no longer names anything real resolves to nothing rather than to something
 wrong. `tiles.ts` carries them, one block per commit.
+
+`radius.ts` carries the blast-radius clamp, which is a different kind of row and
+takes a different door: it is a decision made inside a function rather than a
+record or a table entry, so it arrives on the engine's behaviour seam
+(`ModHooks.projectionRadius`) instead of through a registry. The mod contributes
+the clamp only while `catchup.projections` is on; with the rule off the mod
+contributes no such member at all, and the engine takes the path it takes with
+no mod loaded.
 
 ## Why it is a tile filler rather than a pref file
 
@@ -138,11 +148,12 @@ Two files: `manifest.json` and `plugin.js`. Either of:
 Enabling the mod is not the same as turning anything on. Every toggle starts off;
 open the mod's settings and switch on what you want.
 
-Nothing here is visible in ASCII. Pick a tile set in the Graphics screen first,
-or there is nothing to see.
+The tile rows are not visible in ASCII. Pick a tile set in the Graphics screen
+first, or there is nothing to see from those.
 
-`plugin.js` is generated from `plugin.ts` and `tiles.ts` in this repository,
-bundled into one module. It is committed because that is what an install fetches.
+`plugin.js` is generated from `plugin.ts`, `tiles.ts` and `radius.ts` in this
+repository, bundled into one module. It is committed because that is what an
+install fetches.
 Edit the source, not this file, and if you are reading it to decide whether to
 trust it, that is exactly why it ships unminified.
 
@@ -199,11 +210,22 @@ successor, and being current with a moving target is the whole value of the mod.
 
 ## A note on scores
 
-Tile assignments change no rule, no die roll and no level, so this mod does not
-flag a character's save and a character played with it sits in the score list
-beside one played without it. That would change if a future row here altered
-gameplay: a mod that changes gameplay flags the save, permanently, and a class of
-change that did so would say so in its own toggle.
+This mod does not flag a character's save, so a character played with it sits in
+the score list beside one played without it.
+
+Tile assignments and text corrections change no rule, no die roll and no level,
+so that much is plain. The blast-radius clamp needs a sentence of its own: it
+changes a blast only when the radius asked for is already larger than the
+maximum projection range, and nothing 4.2.6 ships asks for that. A spell, a
+breath, a wand and a trap all stay within the range, and the arc path caps
+itself at it before the clamp is ever consulted. So with this mod alone the
+clamp never fires, which is the same reason upstream classes the bug as
+reachable only from a modded game or the debug command.
+
+That reasoning is what the field rests on rather than a promise, and it would
+change if a future row here altered a rule a player can reach: a mod that
+changes gameplay flags the save, permanently, and a class of change that did so
+would say so in its own toggle.
 
 ## Releasing
 

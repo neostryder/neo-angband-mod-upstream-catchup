@@ -56,9 +56,32 @@ function applyCatchupTiles(fill, registries, core) {
   return written;
 }
 
+// radius.ts
+function clampBlastRadius(rad, maxRange) {
+  return rad > maxRange ? maxRange : rad;
+}
+
 // plugin.ts
 var plugin_default = {
   api: 1,
+  /*
+   * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own
+   * resolved flags, called once per enabled mod, and it must be free of side
+   * effects: the host calls it again for the conflict report.
+   *
+   * A rule that is off contributes NO KEY, rather than a key holding a function
+   * that declines. An absent member is the difference between core taking its
+   * faithful path and core calling into a mod to be told to take it - and the
+   * host reads the keys back to tell a player which mods touch which behaviour,
+   * so a mod that always contributed would always be listed.
+   */
+  hooks(ctx) {
+    const out = {};
+    if (ctx.flags["catchup.projections"] === true) {
+      out.projectionRadius = clampBlastRadius;
+    }
+    return out;
+  },
   register(host, ctx) {
     if (ctx.flags["catchup.tiles"] === true) {
       host.tiles.register((fill) => {

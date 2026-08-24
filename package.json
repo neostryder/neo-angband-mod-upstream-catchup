@@ -1,6 +1,6 @@
 {
   "name": "neo-angband-mod-upstream-catchup",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Changes upstream Angband accepted after the 4.2.6 tag Neo Angband is pinned to, as a mod",
   "license": "GPL-2.0-only",

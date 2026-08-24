@@ -55,6 +55,7 @@ import {
   type CatchupRegistries,
   type CatchupTilesCore,
 } from "./tiles";
+import { clampBlastRadius } from "./radius";
 
 /**
  * What this plugin needs from the host's context, structurally. Declared here
@@ -67,8 +68,56 @@ interface RegisterCtx {
   readonly registries?: CatchupRegistries | undefined;
 }
 
+/**
+ * What `hooks()` is given, and what it may answer with.
+ *
+ * Structural for the same reason RegisterCtx is, and with one addition: this
+ * repository typechecks against the PUBLISHED engine, so naming a member of
+ * core's `ModHooks` here would fail to compile until the release that added it
+ * reached npm. The member below is a subset of that interface by hand, and the
+ * engine ignores a key it does not know - so an engine without the radius seam
+ * runs this mod with `catchup.projections` inert rather than refusing it.
+ */
+interface HooksCtx {
+  readonly flags: Readonly<Record<string, boolean>>;
+}
+
+interface CatchupHooks {
+  /** ModHooks.projectionRadius: the radius a blast is built from. */
+  projectionRadius?: (rad: number, maxRange: number) => number;
+}
+
 export default {
   api: 1,
+
+  /*
+   * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own
+   * resolved flags, called once per enabled mod, and it must be free of side
+   * effects: the host calls it again for the conflict report.
+   *
+   * A rule that is off contributes NO KEY, rather than a key holding a function
+   * that declines. An absent member is the difference between core taking its
+   * faithful path and core calling into a mod to be told to take it - and the
+   * host reads the keys back to tell a player which mods touch which behaviour,
+   * so a mod that always contributed would always be listed.
+   */
+  hooks(ctx: HooksCtx): CatchupHooks {
+    const out: CatchupHooks = {};
+
+    /*
+     * catchup.projections - post-4.2.6 corrections to how a projection is
+     * built. Today: upstream f0f6bd223, the clamp that keeps a blast radius
+     * inside the range its damage table is sized for (upstream issue #6671).
+     * One flag for the CLASS, so a later projection commit joins this row
+     * rather than adding a second switch that asks the player the same
+     * question twice.
+     */
+    if (ctx.flags["catchup.projections"] === true) {
+      out.projectionRadius = clampBlastRadius;
+    }
+
+    return out;
+  },
 
   register(host: ModRegistryHost, ctx: RegisterCtx): void {
     /*
