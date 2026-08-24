@@ -1,0 +1,56 @@
+{
+  "name": "neo-angband-mod-upstream-catchup",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Changes upstream Angband accepted after the 4.2.6 tag Neo Angband is pinned to, as a mod",
+  "license": "GPL-2.0-only",
+  "author": "neostryder (RPGM Tools)",
+  "homepage": "https://github.com/neostryder/neo-angband-mod-upstream-catchup",
+  "type": "module",
+  "//private": [
+    "Not published to npm, and not intended to be. A mod is distributed as a FOLDER the",
+    "game fetches - manifest.json plus plugin.js, at a tag, verified against a digest",
+    "recorded at install. npm is not in that path, and publishing would create a second",
+    "way to get this mod that nothing checks."
+  ],
+  "//dependencies": [
+    "The engine is a devDependency, never a dependency. plugin.js receives it as",
+    "ctx.core at load time; a runtime dependency would mean a second copy of the",
+    "engine's module state living inside the mod, which the builder refuses outright.",
+    "So it is here for TYPES and for the tests, which bind the PUBLISHED 4.2.6 content",
+    "pack against the PUBLISHED engine - the versions a player runs. Every name in a",
+    "ported .prf line is a lookup into that content, so a test against a hand-built",
+    "registry would be asserting its own fixture.",
+    "The mod SDK's plugin builder is what tools/build.mjs runs, and validateManifest is",
+    "what the manifest test checks against."
+  ],
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check": "node tools/build.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm run test && npm run check"
+  },
+  "devDependencies": {
+    "@rpgm-tools/neo-angband-content": "^0.31.1",
+    "@rpgm-tools/neo-angband-core": "^0.31.1",
+    "@rpgm-tools/neo-angband-mod-sdk": "^0.31.1",
+    "@types/node": "^22.20.1",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "//allowScripts": [
+    "npm 12 blocks a dependency postinstall unless it is named here; npm 10, which this",
+    "repo's CI still runs on Node 22, just runs it. Denied rather than approved because it",
+    "was measured to be unnecessary: esbuild resolves its binary through the platform",
+    "optionalDependency (@esbuild/<plat>), and `require(\"esbuild\").version` answers with the",
+    "postinstall skipped. Written down so the two npm versions do not quietly disagree."
+  ],
+  "allowScripts": {
+    "esbuild": false
+  }
+}
