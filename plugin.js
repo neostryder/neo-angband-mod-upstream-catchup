@@ -61,6 +61,11 @@ function clampBlastRadius(rad, maxRange) {
   return rad > maxRange ? maxRange : rad;
 }
 
+// shape-flags.ts
+function learnShapeObviousFlagsDirectly() {
+  return true;
+}
+
 // plugin.ts
 var plugin_default = {
   api: 1,
@@ -79,6 +84,9 @@ var plugin_default = {
     const out = {};
     if (ctx.flags["catchup.projections"] === true) {
       out.projectionRadius = clampBlastRadius;
+    }
+    if (ctx.flags["catchup.shapeFlags"] === true) {
+      out.shapeLearnObviousFlagsDirectly = learnShapeObviousFlagsDirectly;
     }
     return out;
   },

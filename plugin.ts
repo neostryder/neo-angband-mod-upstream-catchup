@@ -56,6 +56,7 @@ import {
   type CatchupTilesCore,
 } from "./tiles";
 import { clampBlastRadius } from "./radius";
+import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 
 /**
  * What this plugin needs from the host's context, structurally. Declared here
@@ -85,6 +86,11 @@ interface HooksCtx {
 interface CatchupHooks {
   /** ModHooks.projectionRadius: the radius a blast is built from. */
   projectionRadius?: (rad: number, maxRange: number) => number;
+  /**
+   * ModHooks.shapeLearnObviousFlagsDirectly: whether a shapechange's obvious
+   * flags are learned directly, on top of the existing equipment-based path.
+   */
+  shapeLearnObviousFlagsDirectly?: () => boolean;
 }
 
 export default {
@@ -114,6 +120,17 @@ export default {
      */
     if (ctx.flags["catchup.projections"] === true) {
       out.projectionRadius = clampBlastRadius;
+    }
+
+    /*
+     * catchup.shapeFlags - post-4.2.6 direct learning of a shapechange's
+     * obvious flags (upstream c8036c51537942a560e3d7f81749c431bbb4701f). The
+     * engine already restricts this to the same obvious-flag set
+     * shapeLearnOnAssume always computed; this rule only says yes to
+     * learning it directly rather than requiring a worn item to match.
+     */
+    if (ctx.flags["catchup.shapeFlags"] === true) {
+      out.shapeLearnObviousFlagsDirectly = learnShapeObviousFlagsDirectly;
     }
 
     return out;

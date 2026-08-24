@@ -1,7 +1,7 @@
 {
   "id": "upstream-catchup",
   "name": "Upstream Catch-up (post-4.2.6)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "shape": "content",
   "facets": [
     "content",
@@ -30,6 +30,12 @@
       "flag": "catchup.projections",
       "title": "Post-4.2.6 projection corrections",
       "description": "Corrections upstream made after 4.2.6 to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (upstream commit f0f6bd223, upstream issue #6671). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, can reach the case this covers. Needs the engine release that added the projection-radius seam; on an older engine this row is inert.",
+      "default": false
+    },
+    {
+      "flag": "catchup.shapeFlags",
+      "title": "Post-4.2.6 shapechange flag learning",
+      "description": "A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but you are never told, because the game only ever checked your equipment. This teaches you exactly the same obvious flags the shape already reveals on assuming it, not anything else about the shape; it does not reveal a resistance or a flag you would still have to experience in play to learn. Needs the engine release that added the shape-flag-learning seam; on an older engine this row is inert.",
       "default": false
     }
   ],

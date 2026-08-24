@@ -12,6 +12,25 @@ Every entry cites the upstream Angband commit it carries, because that citation
 is what decides membership: a change with an accepted upstream commit belongs
 here, and one without belongs to the `bug-fixes` mod.
 
+## 0.1.3 - 2026-08-24
+
+### Added
+
+- **Post-4.2.6 shapechange flag learning (`catchup.shapeFlags`, off by
+  default).** A shape's obvious flags are now learned directly, instead of
+  only through whatever you have worn, matching upstream commit
+  [`c8036c515`](https://github.com/angband/angband/commit/c8036c51537942a560e3d7f81749c431bbb4701f)
+  (2026-07-21), raised in the comments on FAangband issue
+  [#465](https://github.com/NickMcConnell/FAangband/issues/465). Without it, a
+  fox shapechange grants Free Action and nothing worn needs to carry it - but
+  the game never told you, because `shape_learn_on_assume` only ever checked
+  your equipment. This teaches exactly the same obvious flags the shape
+  already reveals on assuming it; it does not reveal a resistance or anything
+  else about the shape you would still have to experience in play to learn.
+  Needs the engine release that added the `shapeLearnObviousFlagsDirectly`
+  seam; on an older engine the rule is inert and the rest of the mod is
+  unaffected.
+
 ## 0.1.2 - 2026-08-24
 
 ### Added

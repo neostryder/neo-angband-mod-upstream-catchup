@@ -411,6 +411,7 @@ describe("manifest.json", () => {
     expect(manifest.rules.map((r) => r.flag)).toEqual([
       "catchup.tiles",
       "catchup.projections",
+      "catchup.shapeFlags",
     ]);
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);
   });
