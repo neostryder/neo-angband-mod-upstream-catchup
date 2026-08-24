@@ -411,6 +411,7 @@ describe("manifest.json", () => {
     expect(manifest.rules.map((r) => r.flag)).toEqual([
       "catchup.tiles",
       "catchup.projections",
+      "catchup.levelRevisitTracking",
     ]);
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);
   });
@@ -420,7 +421,7 @@ describe("manifest.json", () => {
   });
 
   it("floors the engine at the release that shipped registry:tiles", () => {
-    expect(manifest.engine).toBe(">=0.23.0");
+    expect(manifest.engine).toBe(">=0.34.0");
   });
 
   it("carries the version package.json carries", () => {

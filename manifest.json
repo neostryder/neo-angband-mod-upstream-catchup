@@ -1,18 +1,18 @@
 {
   "id": "upstream-catchup",
   "name": "Upstream Catch-up (post-4.2.6)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "shape": "content",
   "facets": [
     "content",
     "plugin"
   ],
   "modApi": 1,
-  "affectsGameplay": false,
+  "affectsGameplay": true,
   "capabilities": [
     "registry:tiles"
   ],
-  "engine": ">=0.23.0",
+  "engine": ">=0.34.0",
   "dependencies": {
     "core": "*"
   },
@@ -30,6 +30,12 @@
       "flag": "catchup.projections",
       "title": "Post-4.2.6 projection corrections",
       "description": "Corrections upstream made after 4.2.6 to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (upstream commit f0f6bd223, upstream issue #6671). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, can reach the case this covers. Needs the engine release that added the projection-radius seam; on an older engine this row is inert.",
+      "default": false
+    },
+    {
+      "flag": "catchup.levelRevisitTracking",
+      "title": "Post-4.2.6 restored-level tracking",
+      "description": "When returning to a persistent level or leaving single combat, discard the old noise field and age the old scent trail by the world ticks spent away. This matches upstream commit 5c45eb958 (2026-08-18), which fixed the stale tracking state after a level revisit. The next normal world tick builds fresh noise and lays fresh scent from the player's new position. This is deliberately separate from bug-fixes' save/reload heatmap persistence: that fix preserves an interrupted in-play level; this one makes an out-of-play level resume as upstream now does. Needs the engine release that added the level-revisited seam; on an older engine this row is inert.",
       "default": false
     }
   ],

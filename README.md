@@ -49,6 +49,7 @@ unrelated commits that all touched monster AI would get one toggle, not three.
 | **Post-4.2.6 tile assignments** (`catchup.tiles`) | 4 upstream commits, March 2026 | Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as coloured letters. In every case the art was already in the sheet and only the line pointing at it was missing. Each block applies to the tile set upstream wrote it for and to no other, and only where that set assigns nothing already, so no picture anybody drew is replaced. None of it is visible in ASCII. |
 | **Post-4.2.6 text corrections** (`catchup.text`) | 1 upstream commit, July 2026 | Wording upstream corrected after the 4.2.6 tag. Today: the Trident 'of Wrath' description spells the Maia's name "Ossë" instead of 4.2.6's "Osse" (commit `f1b1626f6`). Text only; no damage, weight or slot changes. |
 | **Post-4.2.6 projection corrections** (`catchup.projections`) | 1 upstream commit, July 2026 | Corrections to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (commit `f0f6bd223`, upstream issue [#6671](https://github.com/angband/angband/issues/6671)). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, reaches the case this covers. Needs the engine release that added the projection-radius seam; on an older engine the row is inert. |
+| **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is intentionally distinct from `bug-fixes`' in-play save/reload heatmap persistence, which preserves rather than discards old tracking. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
 
 Every toggle defaults to **off**, which is not what the `bug-fixes` mod does and
 is deliberate: core is 4.2.6, a player who installed the game did not ask for
@@ -71,6 +72,7 @@ the whole of the list below.
 | [`ab2d65386`](https://github.com/angband/angband/commit/ab2d65386) | 2026-03-24 | Removed a stale comment about numeric SVALs from two Shockbolt pref files | Shockbolt Dark and Light | **No port needed.** The commit deletes two comment lines and changes no assignment. A stub for it would be a row claiming work that does not exist. |
 | [`f1b1626f6`](https://github.com/angband/angband/commit/f1b1626f6) | 2026-07-26 | Corrected the spelling of Ossë in the Trident 'of Wrath' description | n/a (gamedata text, not a tile) | Yes, under `catchup.text` |
 | [`f0f6bd223`](https://github.com/angband/angband/commit/f0f6bd223b6b9faf0072b0ae7ffb34a812b97349) | 2026-07-28 | Held a blast radius inside the maximum projection range, resolving upstream issue [#6671](https://github.com/angband/angband/issues/6671) | n/a (`src/project.c`, not a tile) | Yes, under `catchup.projections` |
+| [`5c45eb958`](https://github.com/angband/angband/commit/5c45eb9588b8227d4f1b1998e0a627ad7ee11a75) | 2026-08-18 | Remembers the source for reload noise reconstruction, and clears stale noise / ages scent when a frozen level returns | n/a (`game-world.c`, `generate.c`, `load.c`, `save.c`, `ui-game.c`) | Yes, level-revisit half under `catchup.levelRevisitTracking`; its reload design remains separate from `bug-fixes` |
 
 The remaining commits are somebody else's job or nobody's: build, CI and
 platform plumbing, comments, casts. A text, data or behaviour correction is the
@@ -99,13 +101,15 @@ resolves exactly as it resolves for a tile pack's own `graf-*.prf`, and a line
 that no longer names anything real resolves to nothing rather than to something
 wrong. `tiles.ts` carries them, one block per commit.
 
-`radius.ts` carries the blast-radius clamp, which is a different kind of row and
-takes a different door: it is a decision made inside a function rather than a
+`radius.ts` carries the blast-radius clamp and `tracking.ts` carries restored-level
+tracking. Both take the behaviour-seam door: they are decisions inside a function rather than a
 record or a table entry, so it arrives on the engine's behaviour seam
-(`ModHooks.projectionRadius`) instead of through a registry. The mod contributes
+(`ModHooks.projectionRadius` / `ModHooks.levelRevisited`) instead of through a registry. The mod contributes
 the clamp only while `catchup.projections` is on; with the rule off the mod
 contributes no such member at all, and the engine takes the path it takes with
-no mod loaded.
+no mod loaded. The tracking rule likewise contributes only while
+`catchup.levelRevisitTracking` is on; otherwise core resumes frozen heatmaps
+unchanged, its faithful 4.2.6 behaviour.
 
 ## Why it is a tile filler rather than a pref file
 
