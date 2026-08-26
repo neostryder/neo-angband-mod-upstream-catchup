@@ -61,8 +61,9 @@ adding something.
 
 The full post-4.2.6 range was triaged commit by commit against this port. Of the
 161 commits in `f3082213b..upstream/master` measured on 2026-08-08, **none is a
-gameplay addition.** Five touched something this port could carry, and they are
-the whole of the list below.
+gameplay addition.** The commits that touched something this port could carry
+are the whole of the list below - it grows as later upstream commits are
+triaged and carried, so it is not restated as a count here.
 
 | Upstream commit | Date | What it did | Tile set | In this mod |
 | --- | --- | --- | --- | --- |
@@ -113,8 +114,8 @@ no mod loaded. The tracking rule likewise contributes only while
 `catchup.levelRevisitTracking` is on; otherwise core resumes frozen heatmaps
 unchanged, its faithful 4.2.6 behaviour.
 
-`shape-flags.ts` rides the same kind of door, `ModHooks.shapeLearnObviousFlags-
-Directly`. It contributes a plain "yes" rather than a clamp, because the engine
+`shape-flags.ts` rides the same kind of door,
+`ModHooks.shapeLearnObviousFlagsDirectly`. It contributes a plain "yes" rather than a clamp, because the engine
 already computes the exact obvious-flag set upstream's fix learns; the rule
 decides only whether that set is learned directly, never which flags are in it.
 Contributed only while `catchup.shapeFlags` is on, same as every other row here.
@@ -163,8 +164,8 @@ open the mod's settings and switch on what you want.
 The tile rows are not visible in ASCII. Pick a tile set in the Graphics screen
 first, or there is nothing to see from those.
 
-`plugin.js` is generated from `plugin.ts`, `tiles.ts` and `radius.ts` in this
-repository, bundled into one module. It is committed because that is what an
+`plugin.js` is generated from `plugin.ts`, `tiles.ts`, `radius.ts`, `tracking.ts`
+and `shape-flags.ts` in this repository, bundled into one module. It is committed because that is what an
 install fetches.
 Edit the source, not this file, and if you are reading it to decide whether to
 trust it, that is exactly why it ships unminified.
