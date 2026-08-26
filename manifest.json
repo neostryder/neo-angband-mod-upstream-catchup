@@ -1,6 +1,6 @@
 {
   "id": "upstream-catchup",
-  "name": "Upstream Catch-up (post-4.2.6)",
+  "name": "Upstream Catchup",
   "version": "0.1.3",
   "shape": "content",
   "facets": [

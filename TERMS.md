@@ -1,8 +1,8 @@
-# Terms of Use for the Neo Angband Upstream Catch-up Mod
+# Terms of Use for the Neo Angband Upstream Catchup Mod
 
 Effective date: 2026-08-24.
 
-Upstream Catch-up is an optional Neo Angband mod folder, not a separate hosted service. It carries changes that upstream Angband accepted after the 4.2.6 tag the game's core is pinned to, each one cited to the commit that made it. The mod is disabled until installed and enabled, every class of change inside it is a named toggle, and every toggle is off by default. Disabling the mod, or a toggle, restores the base game's corresponding behavior.
+Upstream Catchup is an optional Neo Angband mod folder, not a separate hosted service. It carries changes that upstream Angband accepted after the 4.2.6 tag the game's core is pinned to, each one cited to the commit that made it. The mod is disabled until installed and enabled, every class of change inside it is a named toggle, and every toggle is off by default. Disabling the mod, or a toggle, restores the base game's corresponding behavior.
 
 The mod's present content is tile assignments: which picture a given tile set draws for a creature or an item that tile set had no assignment for. Nothing in it changes game rules, dice, level layout, or any value a character's outcome depends on, so a character played with it is not marked outside the unmodified score comparison. A player remains responsible for deciding whether to use the mod with a particular character and for retaining an export or backup of local saves.
 

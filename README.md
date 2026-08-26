@@ -1,6 +1,6 @@
-# upstream-catchup: Angband after 4.2.6
+# Upstream Catchup
 
-Changes upstream Angband accepted after the `4.2.6` tag, for
+Changes Angband accepted after the `4.2.6` tag, for
 [Neo Angband](https://github.com/neostryder/neo-angband), as a mod.
 
 **This is a mod.** It is off until you enable it, every class of change inside it

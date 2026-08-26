@@ -67,7 +67,7 @@ const REPO_CONFIG = {
     kind: "mod",
   },
   "neo-angband-mod-upstream-catchup": {
-    title: "Upstream Catch-up",
+    title: "Upstream Catchup",
     emoji: "\u{23E9}", // fast-forward
     color: 0x00897b,
     kind: "mod",
