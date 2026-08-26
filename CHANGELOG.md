@@ -12,6 +12,15 @@ Every entry cites the upstream Angband commit it carries, because that citation
 is what decides membership: a change with an accepted upstream commit belongs
 here, and one without belongs to the `bug-fixes` mod.
 
+## Unreleased
+
+## 1.0.0 - 2026-08-26
+
+### Changed
+
+- `manifest.json`'s version and engine floor move to 1.0.0, matching the
+  host game's own public release.
+
 ## 0.1.3 - 2026-08-24
 
 ### Added

@@ -421,8 +421,11 @@ describe("manifest.json", () => {
     expect(manifest.capabilities).toContain("registry:tiles");
   });
 
-  it("floors the engine at the release that shipped registry:tiles", () => {
-    expect(manifest.engine).toBe(">=0.34.0");
+  it("floors the engine at 1.0.0, well above the release that shipped registry:tiles", () => {
+    /* registry:tiles shipped in 0.34.0; the actual floor is 1.0.0 because
+     * every first-party mod's floor moved there alongside the host game's
+     * own 1.0.0 release, which already satisfies the older requirement. */
+    expect(manifest.engine).toBe(">=1.0.0");
   });
 
   it("carries the version package.json carries", () => {
