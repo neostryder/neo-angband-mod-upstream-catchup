@@ -178,25 +178,25 @@ content pack against the **published** engine, because every name in a ported
 would pass for a monster Angband does not have.
 
 ```bash
-npm install
+pnpm install --frozen-lockfile
 ```
 
 ```bash
-npm run verify
+pnpm verify
 ```
 
 That typechecks, runs the tests, and confirms the committed `plugin.js` is a
 current build of the source. The last one matters more than it looks. An install
 fetches the committed `plugin.js` from a pinned tag and runs it as it is; nothing
 rebuilds it on the way in. So a stale artefact passes every other check and is
-the file players actually run, and `npm run check` is the only thing that looks.
+the file players actually run, and `pnpm check` is the only thing that looks.
 
 No checkout of the game is needed. The engine, the content pack and the plugin
-builder are all published packages, so `npm ci` is the whole setup and the suite
+builder are all published packages, so `pnpm install --frozen-lockfile` is the whole setup and the suite
 proves this mod against exactly what a third-party author would install.
 
 ```bash
-npm run build     # rebuild plugin.js after editing the source
+pnpm build     # rebuild plugin.js after editing the source
 ```
 
 ### Testing against an unreleased engine
@@ -206,7 +206,7 @@ is the version a player runs. When you need to run against an engine change that
 has not shipped yet:
 
 ```bash
-NEO_ANGBAND_LOCAL_CORE=1 npm test
+NEO_ANGBAND_LOCAL_CORE=1 pnpm test
 ```
 
 That resolves `@rpgm-tools/neo-angband-core` to `packages/core/dist` in a sibling
