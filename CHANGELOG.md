@@ -12,6 +12,16 @@ Every entry cites the upstream Angband commit it carries, because that citation
 is what decides membership: a change with an accepted upstream commit belongs
 here, and one without belongs to the `bug-fixes` mod.
 
+Starting with this entry, an entry opens with one or more bracketed tags.
+`[Visible]` marks a change a player would notice in the game or mod itself;
+`[Internal]` marks one that touches only code, tooling, or a maintainer's own
+workflow, with nothing for a player to see. A further tag (`[Security]`,
+`[Balance]`, `[UI]`, `[Modding-API]`, `[Localization]`, `[Save-Compat]`,
+`[Docs]`, `[Content]`, `[Compatibility]`, and others as they come up) names
+what kind of change it is. Lists appear in this order and each is omitted
+when empty for a release: Added, Changed, Removed, Fixed. Earlier entries
+were not retagged.
+
 ## Unreleased
 
 ## 1.0.0 - 2026-08-26
@@ -60,7 +70,7 @@ here, and one without belongs to the `bug-fixes` mod.
   (2026-07-28), which closed upstream issue
   [#6671](https://github.com/angband/angband/issues/6671). Without it a blast
   reaches distances its own damage table has no entry for, and every grid out
-  there is dealt a damage that is not a number at all. A radius already within
+  there receives damage that is not a number at all. A radius already within
   range is left exactly as it was, so switching the rule on changes nothing any
   4.2.6 spell, breath, wand or trap can ask for - only another mod, or the debug
   command, reaches the case this covers. This is the mod's first rule that
