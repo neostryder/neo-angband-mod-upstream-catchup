@@ -35,8 +35,8 @@ One question decides which mod a change belongs to:
   player means by an unofficial patch.
 
 A fix that upstream later accepts MOVES from `bug-fixes` to here at the next
-release. That migration is the reason for the split rather than a cost of it:
-merged into one mod, the permanent patch set would be buried under the finite
+release. That is why the split exists: if merged into one mod, the permanent
+patch set would be buried under the finite
 one's churn and neither could be reviewed on its own.
 
 ## What is in it
@@ -62,7 +62,7 @@ adding something.
 The full post-4.2.6 range was triaged commit by commit against this port. Of the
 161 commits in `f3082213b..upstream/master` measured on 2026-08-08, **none is a
 gameplay addition.** The commits that touched something this port could carry
-are the whole of the list below - it grows as later upstream commits are
+make up the list below. It grows as later upstream commits are
 triaged and carried, so it is not restated as a count here.
 
 | Upstream commit | Date | What it did | Tile set | In this mod |
@@ -91,34 +91,36 @@ unrelated reason (dropping an obsolete two-handed-weapon clause 4.2.6's text
 still carries). Both mods patch the same field. This mod's patch is written
 against 4.2.6's own baseline wording, not against `bug-fixes`' rewritten
 version, since neither mod can assume the other is installed. With both mods
-enabled, whichever patch composes last for that field wins entirely for it -
-the two do not merge. If you run both, expect either the corrected spelling
+enabled, whichever patch composes last for that field wins entirely for it.
+The two do not merge. If you run both, expect either the corrected spelling
 or the corrected two-handed clause for this one description, not both, until
 the composition order is something you have checked.
 
 ### The assignments themselves
 
-The ported text is upstream's own `.prf` lines, unchanged, in `ui-prefs.c`'s own
-grammar, and the engine's own port of that grammar is what reads them. So a name
-resolves exactly as it resolves for a tile pack's own `graf-*.prf`, and a line
+The ported text consists of upstream's own `.prf` lines, unchanged, in
+`ui-prefs.c`'s grammar, and the engine's port of that grammar is what reads them.
+A name resolves exactly as it resolves for a tile pack's own `graf-*.prf`, and a line
 that no longer names anything real resolves to nothing rather than to something
 wrong. `tiles.ts` carries them, one block per commit.
 
 `radius.ts` carries the blast-radius clamp and `tracking.ts` carries restored-level
-tracking. Both take the behaviour-seam door: they are decisions inside a function rather than a
-record or a table entry, so it arrives on the engine's behaviour seam
-(`ModHooks.projectionRadius` / `ModHooks.levelRevisited`) instead of through a registry. The mod contributes
+tracking. Both use the behaviour seam: they are decisions inside a function
+rather than a record or a table entry, so they arrive on the engine's behaviour
+seam (`ModHooks.projectionRadius` / `ModHooks.levelRevisited`) instead of through
+a registry. The mod contributes
 the clamp only while `catchup.projections` is on; with the rule off the mod
 contributes no such member at all, and the engine takes the path it takes with
 no mod loaded. The tracking rule likewise contributes only while
 `catchup.levelRevisitTracking` is on; otherwise core resumes frozen heatmaps
 unchanged, its faithful 4.2.6 behaviour.
 
-`shape-flags.ts` rides the same kind of door,
+`shape-flags.ts` uses the same kind of seam,
 `ModHooks.shapeLearnObviousFlagsDirectly`. It contributes a plain "yes" rather than a clamp, because the engine
 already computes the exact obvious-flag set upstream's fix learns; the rule
 decides only whether that set is learned directly, never which flags are in it.
-Contributed only while `catchup.shapeFlags` is on, same as every other row here.
+It is contributed only while `catchup.shapeFlags` is on, as with every other row
+here.
 
 ## Why it is a tile filler rather than a pref file
 
@@ -192,8 +194,8 @@ rebuilds it on the way in. So a stale artefact passes every other check and is
 the file players actually run, and `pnpm check` is the only thing that looks.
 
 No checkout of the game is needed. The engine, the content pack and the plugin
-builder are all published packages, so `pnpm install --frozen-lockfile` is the whole setup and the suite
-proves this mod against exactly what a third-party author would install.
+builder are all published packages, so `pnpm install --frozen-lockfile` is the entire setup and the suite
+proves this mod against what a third-party author would install.
 
 ```bash
 pnpm build     # rebuild plugin.js after editing the source
