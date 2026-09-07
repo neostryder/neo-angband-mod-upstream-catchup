@@ -44,6 +44,8 @@ one's churn and neither could be reviewed on its own.
 One player-facing toggle per **class** of change, not one per commit. Three
 unrelated commits that all touched monster AI would get one toggle, not three.
 
+See the [settings reference](SETTINGS.md) for every flag, its default, and when a change takes effect.
+
 | Toggle | What it covers | What it does |
 | --- | --- | --- |
 | **Post-4.2.6 tile assignments** (`catchup.tiles`) | 4 upstream commits, March 2026 | Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as coloured letters. In every case the art was already in the sheet and only the line pointing at it was missing. Each block applies to the tile set upstream wrote it for and to no other, and only where that set assigns nothing already, so no picture anybody drew is replaced. None of it is visible in ASCII. |
