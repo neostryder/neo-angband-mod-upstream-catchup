@@ -1,0 +1,47 @@
+# Create the GitHub Release that documents each version tag.
+#
+# This mod is distributed as a plain folder, so the release has no build
+# artifact. Its notes are the matching, exact CHANGELOG.md section.
+name: github-release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Extract release notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: node .github/scripts/extract-changelog-section.mjs "$TAG" "$RUNNER_TEMP/release-notes.md"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "GitHub Release for $TAG already exists."
+            exit 0
+          fi
+
+          args=(
+            "$TAG"
+            --repo "$GITHUB_REPOSITORY"
+            --title "Neo Angband: Upstream Catchup ${TAG#v}"
+            --notes-file "$RUNNER_TEMP/release-notes.md"
+            --verify-tag
+          )
+          if [[ "$TAG" == v0.* ]]; then
+            args+=(--prerelease)
+          fi
+          gh release create "${args[@]}"
