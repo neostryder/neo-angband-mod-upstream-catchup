@@ -24,6 +24,18 @@ were not retagged.
 
 ## [Unreleased]
 
+### Added
+
+- [Visible] [Content] **Post-4.2.6 text corrections carries two more upstream corrections.** Vampire Strike says exactly how many hitpoints it drains, and the Priest spell Light of Manwë becomes Light of Varda, with the blessed property blessed by the Valar; the last two used to ship in Bug Fixes. The README cites each upstream commit.
+
+### Changed
+
+- [Visible] [UI] **Setting descriptions read more plainly.** The rule and section descriptions in the mod manager are rewritten for clarity.
+
+### Fixed
+
+- [Visible] [UI] **The Post-4.2.6 text corrections description shows the name Ossë correctly.** It displayed a garbled "OssÃ«".
+
 ## 1.1.0 - 2026-09-11
 
 ### Fixed

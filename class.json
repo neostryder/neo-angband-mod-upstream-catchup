@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:necromancer": [
+          {
+            "op": "set",
+            "path": "book.2.spell.1.desc",
+            "value": [
+              "Teleports you to the nearest living monster and drains its hitpoints to heal and nourish you.  The number of hitpoints drained is twice your level or one more than the monster's current hitpoints, whichever is smaller."
+            ]
+          }
+        ],
+        "core:priest": [
+          {
+            "op": "set",
+            "path": "book.4.spell.4.name",
+            "value": "Light of Varda"
+          }
+        ]
+      }
+    }
+  }
+}

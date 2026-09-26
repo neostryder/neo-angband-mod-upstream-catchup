@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:blessed-melee": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": "Blessed by the Valar (combat bonuses for holy casters)"
+          }
+        ]
+      }
+    }
+  }
+}

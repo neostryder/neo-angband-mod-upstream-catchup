@@ -21,6 +21,8 @@ import { describe, expect, it } from "vitest";
 import { recordKey } from "@rpgm-tools/neo-angband-mod-sdk";
 
 import artifactContrib from "./artifact.json";
+import classContrib from "./class.json";
+import objectPropertyContrib from "./object_property.json";
 import manifest from "./manifest.json";
 
 const require = createRequire(import.meta.url);
@@ -71,5 +73,78 @@ describe("catchup-text: Trident 'of Wrath' spells Ossë (upstream f1b1626f6)", (
     /* Nothing else about the sentence moved - this patch is the diaeresis and
      * nothing else, unlike bug-fixes' unrelated rewrite of the same field. */
     expect(after.replace("Ossë", "Osse")).toBe(before);
+  });
+});
+
+/**
+ * The three later corrections, each written as (file, record, path, 4.2.6's
+ * text, upstream's corrected text, commit). The ref is derived from the pack
+ * record with recordKey, never copied from the JSON, so a ref naming the wrong
+ * record fails here.
+ */
+const LATER = [
+  {
+    commit: "897ab3a3f",
+    file: "class",
+    contrib: classContrib,
+    find: { name: "Necromancer" },
+    path: "book.2.spell.1.desc",
+    before: [
+      "Teleports you to the nearest living monster and drains a level-dependent",
+      " number of hitpoints, healing and nourishing the player.",
+    ],
+    after: [
+      "Teleports you to the nearest living monster and drains its hitpoints to heal and nourish you.  The number of hitpoints drained is twice your level or one more than the monster's current hitpoints, whichever is smaller.",
+    ],
+  },
+  {
+    commit: "780e326fd",
+    file: "class",
+    contrib: classContrib,
+    find: { name: "Priest" },
+    path: "book.4.spell.4.name",
+    before: "Light of Manwë",
+    after: "Light of Varda",
+  },
+  {
+    commit: "780e326fd",
+    file: "object_property",
+    contrib: objectPropertyContrib,
+    find: { code: "BLESSED", name: "blessed melee" },
+    path: "desc",
+    before: "Blessed by the gods (combat bonuses for holy casters)",
+    after: "Blessed by the Valar (combat bonuses for holy casters)",
+  },
+] as const;
+
+function valueAtPath(value: unknown, path: string): unknown {
+  return path.split(".").reduce<unknown>((current, part) => {
+    if (Array.isArray(current)) return current[Number(part)];
+    if (typeof current === "object" && current !== null) return (current as Record<string, unknown>)[part];
+    return undefined;
+  }, value);
+}
+
+type FieldPatches = Record<string, { op: string; path: string; value: unknown }[]>;
+
+describe("catchup-text: later upstream wording corrections", () => {
+  for (const row of LATER) {
+    it(`${row.file} ${row.path} (upstream ${row.commit})`, () => {
+      const hits = corePack(row.file).records.filter((r) =>
+        Object.entries(row.find).every(([k, v]) => r[k] === v),
+      );
+      expect(hits).toHaveLength(1);
+      const ref = `core:${recordKey(row.file, hits[0]!)}`;
+      expect(valueAtPath(hits[0], row.path)).toEqual(row.before);
+      const patches = (row.contrib.sections["catchup-text"] as { fieldPatches: FieldPatches }).fieldPatches;
+      expect(patches[ref]).toContainEqual({ op: "set", path: row.path, value: row.after });
+    });
+  }
+
+  it("ships no field patch the table above does not name", () => {
+    const shipped = [classContrib, objectPropertyContrib].flatMap((c) =>
+      Object.values((c.sections["catchup-text"] as { fieldPatches: FieldPatches }).fieldPatches).flat(),
+    );
+    expect(shipped).toHaveLength(LATER.length);
   });
 });

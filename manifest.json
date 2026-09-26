@@ -18,31 +18,31 @@
   },
   "author": "neostryder",
   "license": "GPL-2.0-only",
-  "description": "Opt-in changes from real upstream Angband development after the 4.2.6 tag this port is pinned to. Each class of change is a named toggle, cited to the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nThis mod expires by design: the day core rebaselines onto a newer upstream tag, everything in it is already in the game and the mod deletes itself.",
+  "description": "Opt-in changes from upstream Angband development after 4.2.6, the tag this port is pinned to. Each kind of change has its own toggle and cites the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nOnce core rebaselines onto a newer upstream tag, everything here is already in the game and the mod deletes itself.",
   "rules": [
     {
       "flag": "catchup.tiles",
       "title": "Post-4.2.6 tile assignments",
-      "description": "Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as letters. Beorn's bear form in David Gervais' tiles; the Knight's Shield in Shockbolt Dark and Light; the Sip of Miruvor and the Draught of the Ents in Nomad's tiles; and eight assignments in Adam Bolt's tiles, for existing art those tiles already carried and nothing pointed at. Each set applies only to the tile set upstream wrote it for, and only where that set assigns nothing already, so no picture anybody drew is replaced. Nothing here changes a rule, a die roll or a level, and none of it is visible in ASCII.",
+      "description": "Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as letters. These are Beorn's bear form in David Gervais' tiles, the Knight's Shield in Shockbolt Dark and Light, the Sip of Miruvor and the Draught of the Ents in Nomad's tiles, and eight assignments in Adam Bolt's tiles that point at art those tiles already carried but nothing used. Each set applies only to the tile set upstream wrote it for, and only where that set has no assignment already, so no existing picture is replaced. None of this changes a rule, a die roll or a level, and none of it shows in ASCII.",
       "default": false,
       "requiresReload": true
     },
     {
       "flag": "catchup.projections",
       "title": "Post-4.2.6 projection corrections",
-      "description": "Corrections upstream made after 4.2.6 to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (upstream commit f0f6bd223, upstream issue #6671). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, can reach the case this covers. Needs the engine release that added the projection-radius seam; on an older engine this row is inert.",
+      "description": "Corrections upstream made after 4.2.6 to how a spell, breath or wand blast is built. The only one so far holds a blast radius larger than the game's maximum projection range at that maximum, so the blast never reaches a distance its damage table has no entry for (upstream commit f0f6bd223, upstream issue #6671). A radius already within range is left as it was. Angband 4.2.6's own spells, breaths and wands never ask for more, so only another mod or the debug command can reach this case. Needs an engine release recent enough to support it; on an older engine this toggle does nothing.",
       "default": false
     },
     {
       "flag": "catchup.shapeFlags",
       "title": "Post-4.2.6 shapechange flag learning",
-      "description": "A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but you are never told, because the game only ever checked your equipment. This teaches you exactly the same obvious flags the shape already reveals on assuming it, not anything else about the shape; it does not reveal a resistance or a flag you would still have to experience in play to learn. Needs the engine release that added the shape-flag-learning seam; on an older engine this row is inert.",
+      "description": "A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). Without it, a fox shapechange grants Free Action even when nothing you wear carries it, but you are never told, because the game only checked your equipment. This teaches you only the obvious flags the shape already reveals when you assume it. A resistance, or any other flag you would still have to experience in play to learn, stays hidden. Needs an engine release recent enough to support it; on an older engine this toggle does nothing.",
       "default": false
     },
     {
       "flag": "catchup.levelRevisitTracking",
       "title": "Post-4.2.6 restored-level tracking",
-      "description": "When returning to a persistent level or leaving single combat, discard the old noise field and age the old scent trail by the world ticks spent away. This matches upstream commit 5c45eb958 (2026-08-18), which fixed the stale tracking state after a level revisit. The next normal world tick builds fresh noise and lays fresh scent from the player's new position. This is deliberately separate from bug-fixes' save/reload heatmap persistence: that fix preserves an interrupted in-play level; this one makes an out-of-play level resume as upstream now does. Needs the engine release that added the level-revisited seam; on an older engine this row is inert.",
+      "description": "When returning to a persistent level or leaving single combat, discard the old noise field and age the old scent trail by the world ticks spent away. This matches upstream commit 5c45eb958 (2026-08-18), which fixed stale tracking state after a level revisit. The next normal world tick builds fresh noise and lays fresh scent from your new position. It is separate from the Bug Fixes mod's save/reload heatmap fix: that one preserves the level you were on when you saved, and this one makes a level you left resume the way upstream now does. Needs an engine release recent enough to support it; on an older engine this toggle does nothing.",
       "default": false
     }
   ],
@@ -51,7 +51,7 @@
       "id": "catchup-text",
       "flag": "catchup.text",
       "title": "Post-4.2.6 text corrections",
-      "description": "Wording upstream corrected after 4.2.6, cited to the upstream commit that made it. Today: the Trident 'of Wrath' description spells the Maia's name \"Ossë\" instead of 4.2.6's \"Osse\" (upstream commit f1b1626f6, 2026-07-26). Text only; no damage, weight or slot changes.",
+      "description": "Brings in wording upstream corrected after 4.2.6: the Maia's name in the Trident 'of Wrath' description is spelled Ossë, the Priest's Light of Manwë is renamed Light of Varda, the blessed property is blessed by the Valar instead of the gods, and Vampire Strike says exactly how many hitpoints it drains. The README cites the upstream commit behind each one. Only the text changes.",
       "default": false
     }
   ],
