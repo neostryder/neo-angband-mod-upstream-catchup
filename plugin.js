@@ -56,6 +56,42 @@ function applyCatchupTiles(fill, registries, core) {
   return written;
 }
 
+// item-text.ts
+var AFFECTS_LINE = /^Affects your ([^\n]*[^.\n])\n$/;
+function catchupObjectInfoText(text) {
+  const m = AFFECTS_LINE.exec(text);
+  return m ? `Affects your ${m[1]}.
+` : text;
+}
+function catchupEffectIntro(intro) {
+  if (intro.effect === "unknown") {
+    switch (intro.itemClass) {
+      case "food":
+      case "potion":
+      case "scroll":
+        return intro.text;
+      case "wand":
+        return "It requires a target. It can be used.";
+      case "staff":
+        return "It can be used.";
+      default:
+        return "It may require a target. It can be used.";
+    }
+  }
+  const target = intro.aimed ? "It requires a target. " : "";
+  if (intro.describedActivation) return `${target}When used, it `;
+  switch (intro.itemClass) {
+    case "food":
+      return `${target}When eaten, it `;
+    case "potion":
+      return `${target}When quaffed, it `;
+    case "scroll":
+      return `${target}When read, it `;
+    default:
+      return `${target}When used, it `;
+  }
+}
+
 // radius.ts
 function clampBlastRadius(rad, maxRange) {
   return rad > maxRange ? maxRange : rad;
@@ -109,6 +145,10 @@ var plugin_default = {
     }
     if (ctx.flags["catchup.levelRevisitTracking"] === true) {
       out.levelRevisited = refreshRevisitedTracking;
+    }
+    if (ctx.flags["catchup.text"] === true) {
+      out.objectInfoText = catchupObjectInfoText;
+      out.effectIntro = catchupEffectIntro;
     }
     return out;
   },

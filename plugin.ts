@@ -55,6 +55,7 @@ import {
   type CatchupRegistries,
   type CatchupTilesCore,
 } from "./tiles";
+import { catchupEffectIntro, catchupObjectInfoText, type EffectIntroFacts } from "./item-text";
 import { clampBlastRadius } from "./radius";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { refreshRevisitedTracking } from "./tracking";
@@ -103,6 +104,10 @@ interface CatchupHooks {
     frozenAt: number,
     now: number,
   ) => void;
+  /** ModHooks.objectInfoText: one fragment of an item description. */
+  objectInfoText?: (text: string) => string;
+  /** ModHooks.effectIntro: the opening words of an effect description. */
+  effectIntro?: (intro: EffectIntroFacts) => string;
 }
 
 export default {
@@ -156,6 +161,18 @@ export default {
      */
     if (ctx.flags["catchup.levelRevisitTracking"] === true) {
       out.levelRevisited = refreshRevisitedTracking;
+    }
+
+    /*
+     * catchup.text also covers item-description wording that core writes in
+     * obj-info.c rather than reading from gamedata, so no content patch can
+     * reach it: the full stop on "Affects your ..." (upstream ad5c8401a) and
+     * the effect introductions (upstream 4153ff6a6). An engine without these
+     * two seams ignores the keys.
+     */
+    if (ctx.flags["catchup.text"] === true) {
+      out.objectInfoText = catchupObjectInfoText;
+      out.effectIntro = catchupEffectIntro;
     }
 
     return out;

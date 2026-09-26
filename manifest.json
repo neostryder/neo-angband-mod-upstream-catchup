@@ -51,7 +51,7 @@
       "id": "catchup-text",
       "flag": "catchup.text",
       "title": "Post-4.2.6 text corrections",
-      "description": "Brings in wording upstream corrected after 4.2.6: the Maia's name in the Trident 'of Wrath' description is spelled Ossë, the Priest's Light of Manwë is renamed Light of Varda, the blessed property is blessed by the Valar instead of the gods, and Vampire Strike says exactly how many hitpoints it drains. The README cites the upstream commit behind each one. Only the text changes.",
+      "description": "Brings in wording upstream corrected after 4.2.6. The Trident 'of Wrath' description spells the Maia's name Ossë. The Priest's Light of Manwë becomes Light of Varda, and the blessed property is blessed by the Valar instead of the gods. Vampire Strike says how many hitpoints it drains. In item descriptions, an \"Affects your\" line ends with a full stop, an effect you must aim says \"It requires a target.\", and wands, staffs, rods and activated items say \"When used\". The README cites the upstream commit behind each one. Only the text changes, and the item-description wording needs a recent engine release.",
       "default": false
     }
   ],

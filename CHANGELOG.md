@@ -26,6 +26,7 @@ were not retagged.
 
 ### Added
 
+- [Visible] [Content] **Post-4.2.6 text corrections now covers item descriptions too.** An "Affects your" line ends with a full stop, an effect you must aim says "It requires a target.", and wands, staffs, rods and activated items say "When used" (upstream ad5c8401a and 4153ff6a6). The game itself now shows 4.2.6's wording here, so this section brings back the wording you saw before. It needs a recent engine release.
 - [Visible] [Content] **Post-4.2.6 text corrections carries two more upstream corrections.** Vampire Strike says exactly how many hitpoints it drains, and the Priest spell Light of Manwë becomes Light of Varda, with the blessed property blessed by the Valar; the last two used to ship in Bug Fixes. The README cites each upstream commit.
 
 ### Changed

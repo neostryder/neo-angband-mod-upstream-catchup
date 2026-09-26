@@ -146,9 +146,8 @@ describe("the plugin obeys its own flag", () => {
   });
 
   it("does not read another rule's flag to decide", () => {
-    expect(
-      plugin.hooks({ flags: { "catchup.tiles": true, "catchup.text": true } }),
-    ).toEqual({});
+    const hooks = plugin.hooks({ flags: { "catchup.tiles": true, "catchup.text": true } });
+    expect("shapeLearnObviousFlagsDirectly" in hooks).toBe(false);
   });
 });
 
