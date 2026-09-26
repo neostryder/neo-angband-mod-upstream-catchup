@@ -41,8 +41,7 @@ one's churn and neither could be reviewed on its own.
 
 ## What is in it
 
-One player-facing toggle per **class** of change, not one per commit. Three
-unrelated commits that all touched monster AI would get one toggle, not three.
+There is one player-facing toggle per class of change rather than per commit, so three unrelated commits that all touched monster AI would share one toggle.
 
 See the [settings reference](SETTINGS.md) for every flag, its default, and when a change takes effect.
 
@@ -52,20 +51,13 @@ See the [settings reference](SETTINGS.md) for every flag, its default, and when 
 | **Post-4.2.6 text corrections** (`catchup.text`) | 1 upstream commit, July 2026 | Wording upstream corrected after the 4.2.6 tag. Today: the Trident 'of Wrath' description spells the Maia's name "Ossë" instead of 4.2.6's "Osse" (commit `f1b1626f6`). Text only; no damage, weight or slot changes. |
 | **Post-4.2.6 projection corrections** (`catchup.projections`) | 1 upstream commit, July 2026 | Corrections to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (commit `f0f6bd223`, upstream issue [#6671](https://github.com/angband/angband/issues/6671)). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, reaches the case this covers. Needs the engine release that added the projection-radius seam; on an older engine the row is inert. |
 | **Post-4.2.6 shapechange flag learning** (`catchup.shapeFlags`) | 1 upstream commit, July 2026 | A correction to how taking on a shape teaches you what it grants. Today: a shape's obvious flags are learned directly, instead of only through whatever you have worn (commit `c8036c515`, raised in the comments on FAangband issue [#465](https://github.com/NickMcConnell/FAangband/issues/465)). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but the game never told you, because it only ever checked your equipment. This teaches exactly the same obvious flags the shape already reveals on assuming it, nothing broader. Needs the engine release that added the shape-flag-learning seam; on an older engine the row is inert. |
-| **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is intentionally distinct from `bug-fixes`' in-play save/reload heatmap persistence, which preserves rather than discards old tracking. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
+| **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is separate from `bug-fixes`' in-play save/reload heatmap persistence, which keeps old tracking instead of discarding it. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
 
-Every toggle defaults to **off**, which is not what the `bug-fixes` mod does and
-is deliberate: core is 4.2.6, a player who installed the game did not ask for
-anything later than that, and a change arriving switched on would be the port
-adding something.
+Every toggle defaults to off, unlike in the `bug-fixes` mod. Core is 4.2.6, someone who installed the game did not ask for anything later than that, and a change arriving switched on would amount to the port adding something.
 
 ### One row per upstream commit
 
-The full post-4.2.6 range was triaged commit by commit against this port. Of the
-161 commits in `f3082213b..upstream/master` measured on 2026-08-08, **none is a
-gameplay addition.** The commits that touched something this port could carry
-make up the list below. It grows as later upstream commits are
-triaged and carried, so it is not restated as a count here.
+Every commit after 4.2.6 was checked one by one against this port. Of the 161 commits in `f3082213b..upstream/master` as of 2026-08-08, none adds gameplay. The table lists the commits that touched something this port could carry, and it grows as later upstream commits are checked and carried.
 
 | Upstream commit | Date | What it did | Tile set | In this mod |
 | --- | --- | --- | --- | --- |
@@ -79,12 +71,7 @@ triaged and carried, so it is not restated as a count here.
 | [`c8036c515`](https://github.com/angband/angband/commit/c8036c51537942a560e3d7f81749c431bbb4701f) | 2026-07-21 | Learn a shapechange's obvious flags directly, instead of only through worn equipment | n/a (`src/obj-knowledge.c`, not a tile) | Yes, under `catchup.shapeFlags` |
 | [`5c45eb958`](https://github.com/angband/angband/commit/5c45eb9588b8227d4f1b1998e0a627ad7ee11a75) | 2026-08-18 | Remembers the source for reload noise reconstruction, and clears stale noise / ages scent when a frozen level returns | n/a (`game-world.c`, `generate.c`, `load.c`, `save.c`, `ui-game.c`) | Yes, level-revisit half under `catchup.levelRevisitTracking`; its reload design remains separate from `bug-fixes` |
 
-The remaining commits are somebody else's job or nobody's: build, CI and
-platform plumbing, comments, casts. A text, data or behaviour correction is the
-`bug-fixes` mod's to carry ONLY when upstream has not accepted a fix for it;
-once upstream does, it belongs here, cited by SHA - `f1b1626f6` above shipped
-briefly in `bug-fixes` 0.19.0 before being redirected here in 0.19.1/0.1.1 for
-exactly that reason.
+The remaining commits have nothing for this mod to carry: build, CI and platform plumbing, comments and casts. The `bug-fixes` mod carries a text, data or behaviour correction only while upstream has not accepted a fix for it; once upstream does, the correction belongs here, cited by SHA. `f1b1626f6` above shipped briefly in `bug-fixes` 0.19.0 and moved here in 0.19.1/0.1.1 for that reason.
 
 ### A known interaction with the `bug-fixes` mod
 
@@ -100,54 +87,19 @@ the composition order is something you have checked.
 
 ### The assignments themselves
 
-The ported text consists of upstream's own `.prf` lines, unchanged, in
-`ui-prefs.c`'s grammar, and the engine's port of that grammar is what reads them.
-A name resolves exactly as it resolves for a tile pack's own `graf-*.prf`, and a line
-that no longer names anything real resolves to nothing rather than to something
-wrong. `tiles.ts` carries them, one block per commit.
+The tile assignments are upstream's own `.prf` lines, unchanged, in `ui-prefs.c`'s grammar, and the engine's port of that grammar reads them. A name resolves exactly as it would in a tile pack's own `graf-*.prf`, and a line that no longer names anything real resolves to nothing rather than to the wrong thing. `tiles.ts` holds them, one block per commit.
 
-`radius.ts` carries the blast-radius clamp and `tracking.ts` carries restored-level
-tracking. Both use the behaviour seam: they are decisions inside a function
-rather than a record or a table entry, so they arrive on the engine's behaviour
-seam (`ModHooks.projectionRadius` / `ModHooks.levelRevisited`) instead of through
-a registry. The mod contributes
-the clamp only while `catchup.projections` is on; with the rule off the mod
-contributes no such member at all, and the engine takes the path it takes with
-no mod loaded. The tracking rule likewise contributes only while
-`catchup.levelRevisitTracking` is on; otherwise core resumes frozen heatmaps
-unchanged, its faithful 4.2.6 behaviour.
+`radius.ts` holds the blast-radius clamp and `tracking.ts` holds restored-level tracking. Each is a decision inside a function rather than a record or a table entry, so both use the engine's behaviour seam (`ModHooks.projectionRadius` / `ModHooks.levelRevisited`) instead of a registry. The mod supplies the clamp only while `catchup.projections` is on; with the rule off it supplies no hook at all, and the engine takes the same path as with no mod loaded. The tracking rule is supplied only while `catchup.levelRevisitTracking` is on, and otherwise core resumes frozen heatmaps unchanged, as 4.2.6 does.
 
-`shape-flags.ts` uses the same kind of seam,
-`ModHooks.shapeLearnObviousFlagsDirectly`. It contributes a plain "yes" rather than a clamp, because the engine
-already computes the exact obvious-flag set upstream's fix learns; the rule
-decides only whether that set is learned directly, never which flags are in it.
-It is contributed only while `catchup.shapeFlags` is on, as with every other row
-here.
+`shape-flags.ts` uses the same kind of seam, `ModHooks.shapeLearnObviousFlagsDirectly`. It answers a plain "yes" rather than a clamp, because the engine already works out the exact set of obvious flags upstream's fix learns; the rule decides only whether that set is learned directly, never which flags are in it. Like every other row here, it is supplied only while its toggle, `catchup.shapeFlags`, is on.
 
 ## Why it is a tile filler rather than a pref file
 
-A mod may declare a `.prf` file as a `prefs` resource, and the game runs it
-through that same grammar. That door is the wrong one here, for a measured
-reason: a mod's pref resource is replayed into **every** tile map the game
-builds, whatever tile set is loaded, and the `prefs` resource kind forbids a
-slot, so there is nothing to scope it with. The pref grammar cannot help either.
-Its `?:` expressions test `$SYS`, `$RACE` and `$CLASS`, and that is the whole set
-(`ui-prefs.c` L553-560); no variable names the active tile set.
+A mod may declare a `.prf` file as a `prefs` resource, and the game runs it through the same grammar. That does not work here. A mod's pref resource is replayed into every tile map the game builds, whatever tile set is loaded, and the `prefs` resource kind forbids a slot, so there is no way to scope it. The pref grammar cannot scope it either: its `?:` expressions test only `$SYS`, `$RACE` and `$CLASS` (`ui-prefs.c` L553-560), and no variable names the active tile set.
 
-These four commits are per-tile-set by nature, and each tile set already draws
-what another one was missing. David Gervais' sheet already assigns the Knight's
-Shield, the Sip of Miruvor, the Draught of the Ents and all seven of the
-creatures Adam Bolt's sheet was missing; Shockbolt's already assigns Beorn's bear
-form, both drinks and the same seven creatures. A single pref file carrying all
-four blocks would have repainted ten entries in each of those two sheets, using
-coordinates belonging to somebody else's atlas.
+Each of these four commits applies to one tile set, and each tile set already draws what another was missing. David Gervais' sheet already assigns the Knight's Shield, the Sip of Miruvor, the Draught of the Ents and all seven of the creatures Adam Bolt's sheet was missing; Shockbolt's already assigns Beorn's bear form, both drinks and the same seven creatures. One pref file carrying all four blocks would have repainted ten entries in each of those two sheets, using coordinates from somebody else's atlas.
 
-`registry:tiles` is scoped the way the content is. A filler is told which pack is
-being built, so a block reaches only the tile set upstream wrote it for, and the
-door it writes through (`fillMonster` / `fillObject`) refuses any entry something
-else already assigned. Both guarantees are mechanical rather than promised, and
-`tiles.test.ts` pins them against the real tile-pack catalog and the real 4.2.6
-gamedata.
+`registry:tiles` can be scoped the way the content is. A filler is told which pack is being built, so each block reaches only the tile set upstream wrote it for, and the fill calls it writes through (`fillMonster` / `fillObject`) refuse any entry something else already assigned. The code enforces both, and `tiles.test.ts` checks them against the real tile-pack catalog and the real 4.2.6 gamedata.
 
 ## Installing
 
@@ -176,10 +128,7 @@ trust it, that is exactly why it ships unminified.
 
 ## Working on it
 
-The source lives here, and so do the tests. They bind the **published** 4.2.6
-content pack against the **published** engine, because every name in a ported
-`.prf` line is a lookup into that content: a test against a hand-built registry
-would pass for a monster Angband does not have.
+The source and the tests both live here. The tests bind the published 4.2.6 content pack against the published engine, because every name in a ported `.prf` line is a lookup into that content, and a test against a hand-built registry would pass for a monster Angband does not have.
 
 ```bash
 pnpm install --frozen-lockfile
@@ -189,15 +138,9 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-That typechecks, runs the tests, and confirms the committed `plugin.js` is a
-current build of the source. The last one matters more than it looks. An install
-fetches the committed `plugin.js` from a pinned tag and runs it as it is; nothing
-rebuilds it on the way in. So a stale artefact passes every other check and is
-the file players actually run, and `pnpm check` is the only thing that looks.
+That typechecks, runs the tests, and confirms the committed `plugin.js` is a current build of the source. The last step matters because an install fetches the committed `plugin.js` from a pinned tag and runs it as it is, with no rebuild on the way. A stale `plugin.js` passes every other check and is still the file players run, and `pnpm check` is the only step that catches it.
 
-No checkout of the game is needed. The engine, the content pack and the plugin
-builder are all published packages, so `pnpm install --frozen-lockfile` is the entire setup and the suite
-proves this mod against what a third-party author would install.
+You do not need a checkout of the game. The engine, the content pack and the plugin builder are all published packages, so `pnpm install --frozen-lockfile` is the whole setup, and the suite tests this mod against the same packages a third-party author would install.
 
 ```bash
 pnpm build     # rebuild plugin.js after editing the source
@@ -220,29 +163,16 @@ nobody named.
 
 ## Keeping it current
 
-Upstream `master` has moved past the 2026-08-08 cutoff the triage above measured.
-Whatever re-triages that range routes any new verdict into the table above and
-opens a ticket per commit. Without that step the triage is a snapshot with no
-successor, and being current with a moving target is the whole value of the mod.
+Upstream `master` has moved on since the 2026-08-08 cutoff of the check above. Re-checking that range means adding each new verdict to the table above and opening a ticket per commit. The mod is only useful while it keeps up with upstream, so the check has to be repeated.
 
 ## A note on scores
 
 This mod does not flag a character's save, so a character played with it sits in
 the score list beside one played without it.
 
-Tile assignments and text corrections change no rule, no die roll and no level,
-so that much is plain. The blast-radius clamp needs a sentence of its own: it
-changes a blast only when the radius asked for is already larger than the
-maximum projection range, and nothing 4.2.6 ships asks for that. A spell, a
-breath, a wand and a trap all stay within the range, and the arc path caps
-itself at it before the clamp is ever consulted. So with this mod alone the
-clamp never fires, which is the same reason upstream classes the bug as
-reachable only from a modded game or the debug command.
+Tile assignments and text corrections change no rule, die roll or level. The blast-radius clamp changes a blast only when the radius asked for is already larger than the maximum projection range, and nothing 4.2.6 ships asks for that: spells, breaths, wands and traps all stay within the range, and the arc path caps itself at the range before the clamp is ever consulted. With this mod alone, then, the clamp never fires, which is also why upstream classes the bug as reachable only from a modded game or the debug command.
 
-That reasoning is what the field rests on rather than a promise, and it would
-change if a future row here altered a rule a player can reach: a mod that
-changes gameplay flags the save, permanently, and a class of change that did so
-would say so in its own toggle.
+Leaving the save unflagged rests on that reasoning, and it would change if a future row here altered a rule a player can reach: a mod that changes gameplay flags the save permanently, and a class of change that did so would say so in its own toggle.
 
 ## Releasing
 
