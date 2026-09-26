@@ -31,7 +31,10 @@ export interface EffectIntroFacts {
   readonly text: string;
 }
 
-/** "Affects your stealth\n" with no full stop yet, capturing the stat list. */
+/**
+ * Matches a stat line such as "Affects your stealth" that has no full stop
+ * before its line break. Group 1 is the stat list.
+ */
 const AFFECTS_LINE = /^Affects your ([^\n]*[^.\n])\n$/;
 
 /**
