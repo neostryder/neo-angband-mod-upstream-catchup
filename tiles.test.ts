@@ -421,11 +421,12 @@ describe("manifest.json", () => {
     expect(manifest.capabilities).toContain("registry:tiles");
   });
 
-  it("floors the engine at 1.0.0, well above the release that shipped registry:tiles", () => {
-    /* registry:tiles shipped in 0.34.0; the actual floor is 1.0.0 because
-     * every first-party mod's floor moved there alongside the host game's
-     * own 1.0.0 release, which already satisfies the older requirement. */
-    expect(manifest.engine).toBe(">=1.0.0");
+  it("floors the engine at 1.18.0, where the item-description hooks arrived", () => {
+    /* The item-description corrections need the objectInfoText and
+     * effectIntro hooks, which core added in 1.18.0. That is higher than
+     * both registry:tiles (0.34.0) and the 1.0.0 floor every first-party
+     * mod shares. */
+    expect(manifest.engine).toBe(">=1.18.0");
   });
 
   it("carries the version package.json carries", () => {

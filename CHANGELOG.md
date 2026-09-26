@@ -32,6 +32,8 @@ were not retagged.
 ### Changed
 
 - [Visible] [UI] **Setting descriptions read more plainly.** The rule and section descriptions in the mod manager are rewritten for clarity.
+- [Visible] [Docs] **The README explains in plainer words why every toggle starts off and how each upstream commit after 4.2.6 was checked.** The terms and AI usage policy are reworded too.
+- [Visible] [Compatibility] **Needs Neo Angband 1.18.0 or newer.** The new item-description corrections rely on text hooks that game version added, so an older game is offered Upstream Catchup 1.1.0 instead.
 
 ### Fixed
 
