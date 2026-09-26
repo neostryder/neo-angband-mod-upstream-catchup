@@ -24,6 +24,8 @@ were not retagged.
 
 ## [Unreleased]
 
+## 1.2.0 - 2026-09-26
+
 ### Added
 
 - [Visible] [Content] **Post-4.2.6 text corrections now covers item descriptions too.** An "Affects your" line ends with a full stop, an effect you must aim says "It requires a target.", and wands, staffs, rods and activated items say "When used" (upstream ad5c8401a and 4153ff6a6). The game itself now shows 4.2.6's wording here, so this section brings back the wording you saw before. It needs a recent engine release.
