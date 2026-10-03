@@ -167,16 +167,15 @@ nobody named.
 
 ## Keeping it current
 
-Upstream `master` has moved on since the 2026-08-08 cutoff of the check above. Re-checking that range means adding each new verdict to the table above and opening a ticket per commit. The mod is only useful while it keeps up with upstream, so the check has to be repeated.
+Upstream `master` has moved on since the 2026-08-08 cutoff of the check above. The table already carries one commit from that range, `5c45eb958`, and checking the rest of it means adding each new verdict to the table above and opening a ticket per commit. The mod is only useful while it keeps up with upstream, so the check has to be repeated.
 
 ## A note on scores
 
-This mod does not flag a character's save, so a character played with it sits in
-the score list beside one played without it.
+This mod flags a character's save permanently once it is enabled, so a character played with it does not sit in the score list beside one played without it.
 
 Tile assignments and text corrections change no rule, die roll or level. The blast-radius clamp changes a blast only when the radius asked for is already larger than the maximum projection range, and nothing 4.2.6 ships asks for that: spells, breaths, wands and traps all stay within the range, and the arc path caps itself at the range before the clamp is ever consulted. With this mod alone, then, the clamp never fires, which is also why upstream classes the bug as reachable only from a modded game or the debug command.
 
-Leaving the save unflagged rests on that reasoning, and it would change if a future row here altered a rule a player can reach: a mod that changes gameplay flags the save permanently, and a class of change that did so would say so in its own toggle.
+Two rows do alter rules a player can reach: `catchup.shapeFlags` has a shapechange teach its obvious flags directly, and `catchup.levelRevisitTracking` clears noise and ages scent when you return to a frozen level, which changes what monsters can follow. A mod that changes gameplay flags the save permanently, and `manifest.json` declares `"affectsGameplay": true`.
 
 ## Releasing
 
