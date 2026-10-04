@@ -1,6 +1,22 @@
 // upstream-catchup - generated from plugin.ts by neo-angband-mod-build
 // (@rpgm-tools/neo-angband-mod-sdk). Edit the TypeScript source, not this file.
 
+// core-adapter.ts
+function createAdapter(ctx) {
+  return {
+    meta: {
+      flags: ctx.flags
+    },
+    engine: {
+      get tiles() {
+        return ctx.core;
+      },
+      prefTables: () => ctx.registries,
+      registerTileFiller: (host, filler) => host.tiles.register(filler)
+    }
+  };
+}
+
 // tiles.ts
 var CATCHUP_TILE_SETS = [
   {
@@ -153,9 +169,10 @@ var plugin_default = {
     return out;
   },
   register(host, ctx) {
-    if (ctx.flags["catchup.tiles"] === true) {
-      host.tiles.register((fill) => {
-        applyCatchupTiles(fill, ctx.registries, ctx.core);
+    const { meta, engine } = createAdapter(ctx);
+    if (meta.flags["catchup.tiles"] === true) {
+      engine.registerTileFiller(host, (fill) => {
+        applyCatchupTiles(fill, engine.prefTables(), engine.tiles);
       });
     }
   }

@@ -37,7 +37,8 @@
  * `plugin.js` that ships in this repository, and a module fetched from a folder
  * cannot resolve a bare specifier - nor should it, because a bundled copy of
  * core would give the plugin its own registries while the game ran on another
- * set. `tiles.ts` is handed the slice it needs for the same reason.
+ * set. core-adapter.ts is the one file that reads the context's engine
+ * members, and `tiles.ts` is handed the slice it needs from there.
  *
  * `register` rather than `hooks`, because a tile filler is a system override
  * through the capability-gated registry facade rather than a fold into core's
@@ -50,26 +51,12 @@
  */
 
 import type { ModRegistryHost } from "@rpgm-tools/neo-angband-core";
-import {
-  applyCatchupTiles,
-  type CatchupRegistries,
-  type CatchupTilesCore,
-} from "./tiles";
+import { createAdapter, type RegisterCtx } from "./core-adapter";
+import { applyCatchupTiles } from "./tiles";
 import { catchupEffectIntro, catchupObjectInfoText, type EffectIntroFacts } from "./item-text";
 import { clampBlastRadius } from "./radius";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { refreshRevisitedTracking } from "./tracking";
-
-/**
- * What this plugin needs from the host's context, structurally. Declared here
- * rather than imported from the host, because this file has to compile in a
- * standalone mod repository that holds no copy of it.
- */
-interface RegisterCtx {
-  readonly flags: Readonly<Record<string, boolean>>;
-  readonly core: CatchupTilesCore;
-  readonly registries?: CatchupRegistries | undefined;
-}
 
 /**
  * What `hooks()` is given, and what it may answer with.
@@ -190,9 +177,10 @@ export default {
      * who installed the game did not ask for anything later than that; a class
      * of change arriving switched on would be the port adding something.
      */
-    if (ctx.flags["catchup.tiles"] === true) {
-      host.tiles.register((fill) => {
-        applyCatchupTiles(fill, ctx.registries, ctx.core);
+    const { meta, engine } = createAdapter(ctx);
+    if (meta.flags["catchup.tiles"] === true) {
+      engine.registerTileFiller(host, (fill) => {
+        applyCatchupTiles(fill, engine.prefTables(), engine.tiles);
       });
     }
   },
