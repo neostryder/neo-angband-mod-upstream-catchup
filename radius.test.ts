@@ -31,9 +31,11 @@ import {
 import { Chunk, FEAT, PROJECT, bindCore, computeProjection } from "@rpgm-tools/neo-angband-core";
 import type { CoreRegistries, GamePack } from "@rpgm-tools/neo-angband-core";
 
-import manifest from "./manifest.json";
+import manifestDocument from "./manifest.json";
 import plugin from "./plugin";
 import { clampBlastRadius } from "./radius";
+
+const manifest = manifestDocument.data;
 
 /* ------------------------------------------------------------------ *
  * Content: the published 4.2.6 pack, bound the way a session binds it.

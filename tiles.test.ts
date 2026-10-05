@@ -40,7 +40,7 @@ import type {
   TileFiller,
 } from "@rpgm-tools/neo-angband-core";
 import * as neoCore from "@rpgm-tools/neo-angband-core";
-import { validateManifest } from "@rpgm-tools/neo-angband-mod-sdk";
+import { matchCapability, validateManifest } from "@rpgm-tools/neo-angband-mod-sdk";
 import plugin from "./plugin";
 import { CATCHUP_TILE_SETS, applyCatchupTiles, catchupTileSetFor } from "./tiles";
 
@@ -393,9 +393,10 @@ describe("the mod's entry point", () => {
  * ------------------------------------------------------------------ */
 
 describe("manifest.json", () => {
-  const manifest = JSON.parse(
+  const document = JSON.parse(
     readFileSync(new URL("./manifest.json", import.meta.url), "utf8"),
-  ) as {
+  );
+  const manifest = validateManifest(document) as {
     id: string;
     version: string;
     engine: string;
@@ -404,7 +405,17 @@ describe("manifest.json", () => {
   };
 
   it("is a manifest the game would accept", () => {
-    expect(() => validateManifest(manifest)).not.toThrow();
+    expect(() => validateManifest(document)).not.toThrow();
+  });
+
+  it("keeps the schema 2 manifest on API 1 with the existing grant", () => {
+    expect(document.format).toBe("neo-angband/mod/manifest");
+    expect(document.schemaVersion).toBe(2);
+    expect(document.data.runtime).toBe("in-process");
+    expect(document.data.api).toBe(">=1.0.0 <2.0.0");
+    expect(validateManifest(document).modApi).toBe(1);
+    expect(manifest.capabilities).toEqual(["registry:tiles"]);
+    expect(matchCapability("registry:tiles")?.entry.tiers).toContain("first-party");
   });
 
   it("declares the flags the plugin reads, and defaults every one of them off", () => {
