@@ -54,9 +54,11 @@ import type {
   Shape,
 } from "@rpgm-tools/neo-angband-core";
 
-import manifest from "./manifest.json";
+import manifestDocument from "./manifest.json";
 import plugin from "./plugin";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
+
+const manifest = manifestDocument.data;
 
 /* ------------------------------------------------------------------ *
  * Content: the published 4.2.6 pack, bound the way the engine's own
