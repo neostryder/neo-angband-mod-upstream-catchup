@@ -49,6 +49,9 @@ describe("the API 2 adapter", () => {
     const facts: Readonly<Record<string, boolean>> = flags;
     const api1 = createAdapter({ flags: facts, core: { parseTilePrefs: () => { throw new Error("Unused engine"); } } });
     const api2 = createApi2Adapter(fakeApi(Object.freeze({ ...facts })));
+    expect(api1.meta).toEqual({ flags: facts });
+    expect(api2.meta).toEqual({ flags: facts });
+    expect(api2.meta.flags).not.toBe(api1.meta.flags);
     expect(api2.meta).toEqual(api1.meta);
     expect(Object.keys(api2)).toEqual(["meta"]);
   });
