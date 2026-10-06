@@ -4,7 +4,7 @@ Upstream Catchup still loads as an API 1 plugin. Its schema 2 manifest declares 
 
 ## Gap audit
 
-The audit counts 13 rows. One has moved, six have an API 2 home but are not wired, and six need a Core addition. The registry row groups the four tables passed to one tile parse.
+The audit has 13 rows. One of them has moved already. Six have somewhere to go in API 2 that isn't wired up yet, and six can't move until Core adds something. The registry row stands for the four tables that one tile parse takes.
 
 | Old member | API 2 home or Core request | Status and notes |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ The audit counts 13 rows. One has moved, six have an API 2 home but are not wire
 | `hooks.projectionRadius(radius, maxRange)` | Core request R3 | The clamp also applies to projections outside the player's view. |
 | `hooks.levelRevisited(chunk, frozenAt, now)` | Core request R4 | The function rewrites the restored chunk's noise and scent arrays. |
 
-The mod has no `ctx.state` or raw snapshot read. It uses no event subscription, storage call, controller, HUD, menu, screen, birth, frontend or regions member. There is no work for `view`, `act`, `events`, `store` or `ui` in this adapter. The tile lookup belongs to `content`, while the remaining changes need declarations or policies. No player-view field or truth read replaces those writes.
+This mod doesn't read `ctx.state` or a raw snapshot, and it doesn't use the event subscription, storage, controller, HUD, menu, screen, birth, frontend or regions members. That leaves `view`, `act`, `events`, `store` and `ui` with nothing to do in this adapter. The tile lookup moves to `content`. The rest of what the mod changes are writes, and they need declarations or policies, because no player-view field or truth read can replace them.
 
 ## Core requests
 
