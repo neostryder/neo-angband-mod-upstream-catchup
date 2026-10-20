@@ -23,6 +23,21 @@ commit that made it.
 
 ## Why it is separate from the bug-fixes mod
 
+```mermaid
+flowchart TD
+  A["A proposed Angband change"] --> B{"Does it change text, data or behaviour?"}
+  B -->|"No, build, CI or comments only"| X["No port needed"]
+  B -->|"Yes"| C{"Does an accepted upstream commit exist?"}
+  C -->|"Yes"| U["Upstream Catchup<br/>The row cites its SHA"]
+  C -->|"No"| F["Bug Fixes<br/>The row cites an issue or measurement"]
+  F -->|"Upstream later accepts the fix"| U
+  U --> T["One toggle per class<br/>catchup.tiles<br/>catchup.text<br/>catchup.projections<br/>catchup.shapeFlags<br/>catchup.levelRevisitTracking"]
+  U --> R["The set expires at the next core rebaseline"]
+  X -.-> E["ab2d65386 only deletes comments"]
+```
+
+*Source of truth: `README.md` for the mod boundary and `manifest.json` for the five toggles.*
+
 One question decides which mod a change belongs to:
 
 **Does an accepted upstream commit exist for this change?**
@@ -90,6 +105,29 @@ or the corrected two-handed clause for this one description, not both, until
 the composition order is something you have checked.
 
 ### The assignments themselves
+
+```mermaid
+flowchart TD
+  F["ctx.flags"] --> H["hooks starts with an empty object"]
+  H --> P{"catchup.projections is true?"}
+  P -->|"Yes"| PH["projectionRadius = clampBlastRadius"]
+  H --> S{"catchup.shapeFlags is true?"}
+  S -->|"Yes"| SH["shapeLearnObviousFlagsDirectly = learnShapeObviousFlagsDirectly"]
+  H --> L{"catchup.levelRevisitTracking is true?"}
+  L -->|"Yes"| LH["levelRevisited = refreshRevisitedTracking"]
+  H --> T{"catchup.text is true?"}
+  T -->|"Yes"| TH["objectInfoText = catchupObjectInfoText<br/>effectIntro = catchupEffectIntro"]
+  H -.-> O["Each false flag contributes no matching key"]
+  F --> R["register"]
+  R --> G{"catchup.tiles is true?"}
+  G -->|"Yes"| TF["registerTileFiller"]
+  TF --> A{"Do registries exist and does the tilesheet pack match?"}
+  A -->|"Yes"| Q["parseTilePrefs for this pack"]
+  Q --> W["fillMonster and fillObject<br/>They write only unassigned entries"]
+  A -->|"No"| N["applyCatchupTiles returns 0"]
+```
+
+*Source of truth: `plugin.ts` and the per-class modules under `src/`. The mod needs engine 1.18.0 or newer, per `manifest.json`.*
 
 The tile assignments are upstream's own `.prf` lines, unchanged, in `ui-prefs.c`'s grammar, and the engine's port of that grammar reads them. A name resolves exactly as it would in a tile pack's own `graf-*.prf`, and a line that no longer names anything real resolves to nothing rather than to the wrong thing. `tiles.ts` holds them, one block per commit.
 
@@ -166,6 +204,22 @@ when it is not a sibling, and a wrong path fails rather than falling back to one
 nobody named.
 
 ## Keeping it current
+
+```mermaid
+flowchart TD
+  B["Neo Angband core stays pinned to Angband 4.2.6"] --> C["The README records 161 checked commits<br/>f3082213b..upstream/master<br/>Cutoff 2026-08-08"]
+  C --> V["Each later upstream commit gets a README verdict<br/>5c45eb958 is already carried"]
+  V --> M["Upstream Catchup carries accepted changes"]
+  M --> U["The player enables the mod"]
+  U --> S["affectsGameplay is true<br/>The save stays flagged permanently"]
+  M --> R["Core rebaselines onto a newer upstream tag"]
+  R --> D["The documented lifecycle ends with removing this mod"]
+  M -.-> T["Trident 'of Wrath' description"]
+  F["Bug Fixes"] -.-> T
+  T --> W["The patch that composes last wins the whole field"]
+```
+
+*Source of truth: `README.md` and `manifest.json`. Retirement is a maintenance policy, not something the code enforces.*
 
 Upstream `master` has moved on since the 2026-08-08 cutoff of the check above. The table already carries one commit from that range, `5c45eb958`, and checking the rest of it means adding each new verdict to the table above and opening a ticket per commit. The mod is only useful while it keeps up with upstream, so the check has to be repeated.
 
