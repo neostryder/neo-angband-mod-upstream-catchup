@@ -142,32 +142,14 @@ describe("the manifest declares the rule, and declares it once", () => {
   });
 });
 
-describe("the plugin obeys its own flag", () => {
-  it("contributes the radius hook only when the rule is on", () => {
-    const contributed = plugin.hooks({ flags: { "catchup.projections": true } });
-    expect(Object.keys(contributed)).toEqual(["projectionRadius"]);
-    /* By BEHAVIOUR, not by identity. `./plugin` resolves to the committed
-     * `plugin.js` - the bundle an install actually fetches and runs - and the
-     * clamp inside it is a different function object from the one this file
-     * imports from the source. Comparing the two by identity would pass only
-     * for as long as it was testing the source instead of the artefact. */
-    expect(contributed.projectionRadius?.(OVER, MAX_RANGE)).toBe(MAX_RANGE);
-    expect(contributed.projectionRadius?.(3, MAX_RANGE)).toBe(3);
-    expect(contributed.projectionRadius?.(OVER, MAX_RANGE)).toBe(
-      clampBlastRadius(OVER, MAX_RANGE),
-    );
-  });
-
-  it("contributes NO KEY when the rule is off", () => {
-    /* Not a function that declines: an absent member is what leaves core on the
-     * path it takes with no mod loaded at all. */
-    expect(plugin.hooks({ flags: { "catchup.projections": false } })).toEqual({});
-    expect(plugin.hooks({ flags: {} })).toEqual({});
-  });
-
-  it("does not read another rule's flag to decide", () => {
-    const hooks = plugin.hooks({ flags: { "catchup.tiles": true, "catchup.text": true } });
-    expect("projectionRadius" in hooks).toBe(false);
+describe("the plugin and this rule", () => {
+  it("contributes no radius hook yet, whether the rule is on or off", () => {
+    /* mod API 2 has no form of projectionRadius (gap register UC-2), so the
+     * rule is inert until the game declares one. clampBlastRadius is the
+     * specification that declaration must match. */
+    expect(plugin.hooks({ id: "upstream-catchup", flags: { "catchup.projections": true } })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: { "catchup.projections": false } })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: {} })).toEqual({});
   });
 });
 

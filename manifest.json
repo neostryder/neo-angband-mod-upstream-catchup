@@ -5,11 +5,11 @@
     "id": "upstream-catchup",
     "name": "Upstream Catchup",
     "version": "1.2.0",
-    "api": ">=1.0.0 <2.0.0",
+    "api": ">=2.0.0 <3.0.0",
     "runtime": "in-process",
     "engine": {
-      "range": ">=1.18.0",
-      "because": "The item-description corrections need the objectInfoText and effectIntro hooks."
+      "range": ">=1.22.0",
+      "because": "The mod needs the game build that runs mod API 2 definitions from a mod folder."
     },
     "dependencies": {
       "required": {
@@ -18,9 +18,7 @@
         }
       }
     },
-    "capabilities": [
-      "registry:tiles"
-    ],
+    "capabilities": [],
     "description": "Opt-in changes from upstream Angband development after 4.2.6, the tag this port is pinned to. Each kind of change has its own toggle and cites the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nOnce core rebaselines onto a newer upstream tag, everything here is already in the game and the mod deletes itself.",
     "author": "neostryder",
     "license": "GPL-2.0-only",

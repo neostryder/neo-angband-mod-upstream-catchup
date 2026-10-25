@@ -44,19 +44,12 @@ describe("catchup.levelRevisitTracking (upstream 5c45eb958)", () => {
     expect(c.scent[at(c, 2, 2)]).toBe(8);
   });
 
-  it("contributes exactly the revisit hook while its own rule is on", () => {
-    const hooks = plugin.hooks({ flags: { "catchup.levelRevisitTracking": true } });
-    expect(Object.keys(hooks)).toEqual(["levelRevisited"]);
-    const c = chunk();
-    c.noise[at(c, 2, 2)] = 9;
-    c.scent[at(c, 2, 2)] = 7;
-    hooks.levelRevisited?.(c, 19, 20);
-    expect(c.noise[at(c, 2, 2)]).toBe(0);
-    expect(c.scent[at(c, 2, 2)]).toBe(8);
-  });
-
-  it("contributes no revisit key while its rule is absent or off", () => {
-    expect(plugin.hooks({ flags: {} })).toEqual({});
-    expect(plugin.hooks({ flags: { "catchup.levelRevisitTracking": false } })).toEqual({});
+  it("contributes no revisit hook yet, whether the rule is on or off", () => {
+    /* mod API 2 has no form of levelRevisited (gap register UC-3), so the rule
+     * is inert until the game declares one. refreshRevisitedTracking is the
+     * specification that declaration must match. */
+    expect(plugin.hooks({ id: "upstream-catchup", flags: { "catchup.levelRevisitTracking": true } })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: {} })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: { "catchup.levelRevisitTracking": false } })).toEqual({});
   });
 });

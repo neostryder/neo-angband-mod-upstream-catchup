@@ -104,16 +104,18 @@ describe("catchup.text: effect introductions (upstream 4153ff6a6)", () => {
   });
 });
 
+const SITE = { section: "stats", tval: "ring", kind: "Speed", aware: true } as const;
+
 describe("catchup.text gates the item-description hooks", () => {
   it("contributes both hooks only when the section is on", () => {
     /* "./plugin" resolves to the built plugin.js, so these check the shipped
      * bundle by what it returns rather than by function identity. */
-    const on = plugin.hooks({ flags: { "catchup.text": true } });
-    expect(on.objectInfoText?.("Affects your stealth\n")).toBe("Affects your stealth.\n");
+    const on = plugin.hooks({ id: "upstream-catchup", flags: { "catchup.text": true } }) ?? {};
+    expect(on.objectInfoText?.("Affects your stealth\n", SITE)).toBe("Affects your stealth.\n");
     expect(on.effectIntro?.(intro({ itemClass: "wand", aimed: true }))).toBe("It requires a target. When used, it ");
 
     for (const flags of [{}, { "catchup.text": false }]) {
-      const off = plugin.hooks({ flags });
+      const off = plugin.hooks({ id: "upstream-catchup", flags }) ?? {};
       expect("objectInfoText" in off).toBe(false);
       expect("effectIntro" in off).toBe(false);
     }
