@@ -40,7 +40,7 @@ import type {
   TileFiller,
 } from "@rpgm-tools/neo-angband-core";
 import * as neoCore from "@rpgm-tools/neo-angband-core";
-import { matchCapability, validateManifest } from "@rpgm-tools/neo-angband-mod-sdk";
+import { validateManifest } from "@rpgm-tools/neo-angband-mod-sdk";
 import plugin from "./plugin";
 import { CATCHUP_TILE_SETS, applyCatchupTiles, catchupTileSetFor } from "./tiles";
 
@@ -347,44 +347,18 @@ describe("an assignment already in the map wins", () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The plugin obeys its own flag.
+ * The plugin and this rule.
  * ------------------------------------------------------------------ */
 
-/** The host's registry facade, reduced to the one door this mod opens. */
-function fakeHost(): { host: ModRegistryHost; fillers: TileFiller[] } {
-  const fillers: TileFiller[] = [];
-  const host = {
-    tiles: {
-      register(filler: TileFiller): void {
-        fillers.push(filler);
-      },
-      player(): void {},
-    },
-  } as unknown as ModRegistryHost;
-  return { host, fillers };
-}
-
 describe("the mod's entry point", () => {
-  it("installs no filler at all while catchup.tiles is off", () => {
-    const { host, fillers } = fakeHost();
-    plugin.register(host, { flags: { "catchup.tiles": false }, core: neoCore, registries: reg });
-    expect(fillers).toHaveLength(0);
-  });
-
-  it("installs exactly one filler when catchup.tiles is on", () => {
-    const { host, fillers } = fakeHost();
-    plugin.register(host, { flags: { "catchup.tiles": true }, core: neoCore, registries: reg });
-    expect(fillers).toHaveLength(1);
-
-    const fill = new FakeFill(sheet("nomad"));
-    fillers[0]?.(fill);
-    expect(fill.objects.size).toBe(2);
-  });
-
-  it("treats an absent flag as off, the same as a false one", () => {
-    const { host, fillers } = fakeHost();
-    plugin.register(host, { flags: {}, core: neoCore, registries: reg });
-    expect(fillers).toHaveLength(0);
+  it("installs no tile filler yet, whether the rule is on or off", () => {
+    /* mod API 2 has no tile declaration by sheet cell (gap register UC-1), so
+     * the rule is inert until the game provides one. applyCatchupTiles and
+     * CATCHUP_TILE_SETS are the specification that declaration must match. */
+    for (const flags of [{ "catchup.tiles": true }, { "catchup.tiles": false }, {}]) {
+      expect(plugin.hooks({ id: "upstream-catchup", flags })).toEqual({});
+    }
+    expect(plugin).not.toHaveProperty("register");
   });
 });
 
@@ -408,14 +382,15 @@ describe("manifest.json", () => {
     expect(() => validateManifest(document)).not.toThrow();
   });
 
-  it("keeps the schema 2 manifest on API 1 with the existing grant", () => {
+  it("declares the schema 2 manifest on API 2 with no grant", () => {
     expect(document.format).toBe("neo-angband/mod/manifest");
     expect(document.schemaVersion).toBe(2);
     expect(document.data.runtime).toBe("in-process");
-    expect(document.data.api).toBe(">=1.0.0 <2.0.0");
-    expect(validateManifest(document).modApi).toBe(1);
-    expect(manifest.capabilities).toEqual(["registry:tiles"]);
-    expect(matchCapability("registry:tiles")?.entry.tiers).toContain("first-party");
+    expect(document.data.api).toBe(">=2.0.0 <3.0.0");
+    expect(() => validateManifest(document)).not.toThrow();
+    /* The hooks this mod declares need no permission. registry:tiles returns
+     * with the tile declaration (gap register UC-1). */
+    expect(manifest.capabilities ?? []).toEqual([]);
   });
 
   it("declares the flags the plugin reads, and defaults every one of them off", () => {
@@ -428,16 +403,8 @@ describe("manifest.json", () => {
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);
   });
 
-  it("declares the capability the filler needs", () => {
-    expect(manifest.capabilities).toContain("registry:tiles");
-  });
-
-  it("floors the engine at 1.18.0, where the item-description hooks arrived", () => {
-    /* The item-description corrections need the objectInfoText and
-     * effectIntro hooks, which core added in 1.18.0. That is higher than
-     * both registry:tiles (0.34.0) and the 1.0.0 floor every first-party
-     * mod shares. */
-    expect(manifest.engine).toBe(">=1.18.0");
+  it("floors the engine at 1.22.0, the build that runs mod API 2 from a mod folder", () => {
+    expect(manifest.engine).toBe(">=1.22.0");
   });
 
   it("carries the version package.json carries", () => {

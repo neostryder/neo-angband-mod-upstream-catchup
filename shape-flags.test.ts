@@ -132,7 +132,7 @@ describe("the manifest declares the rule, and declares it once", () => {
 
 describe("the plugin obeys its own flag", () => {
   it("contributes the shape-flag hook only when the rule is on", () => {
-    const contributed = plugin.hooks({ flags: { "catchup.shapeFlags": true } });
+    const contributed = plugin.hooks({ id: "upstream-catchup", flags: { "catchup.shapeFlags": true } }) ?? {};
     expect(Object.keys(contributed)).toEqual(["shapeLearnObviousFlagsDirectly"]);
     /* By BEHAVIOUR, not by identity - `./plugin` resolves to the committed
      * plugin.js, the bundle an install actually fetches and runs. */
@@ -143,12 +143,12 @@ describe("the plugin obeys its own flag", () => {
   });
 
   it("contributes NO KEY when the rule is off", () => {
-    expect(plugin.hooks({ flags: { "catchup.shapeFlags": false } })).toEqual({});
-    expect(plugin.hooks({ flags: {} })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: { "catchup.shapeFlags": false } })).toEqual({});
+    expect(plugin.hooks({ id: "upstream-catchup", flags: {} })).toEqual({});
   });
 
   it("does not read another rule's flag to decide", () => {
-    const hooks = plugin.hooks({ flags: { "catchup.tiles": true, "catchup.text": true } });
+    const hooks = plugin.hooks({ id: "upstream-catchup", flags: { "catchup.tiles": true, "catchup.text": true } }) ?? {};
     expect("shapeLearnObviousFlagsDirectly" in hooks).toBe(false);
   });
 });
