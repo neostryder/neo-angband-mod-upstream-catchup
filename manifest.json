@@ -18,7 +18,11 @@
         }
       }
     },
-    "capabilities": [],
+    "capabilities": [
+      "registry:tiles",
+      "registry:projection",
+      "registry:monster"
+    ],
     "description": "Opt-in changes from upstream Angband development after 4.2.6, the tag this port is pinned to. Each kind of change has its own toggle and cites the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nOnce core rebaselines onto a newer upstream tag, everything here is already in the game and the mod deletes itself.",
     "author": "neostryder",
     "license": "GPL-2.0-only",

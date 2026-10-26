@@ -35,25 +35,18 @@
  * absent: the game takes its faithful path and the Mods screen does not list
  * this mod as touching that behaviour.
  *
- * THREE RULES WAIT ON THE GAME. Tile assignments by sheet cell, the blast
- * radius clamp and the restored-level tracking each need something the game's
- * mod API 2 does not yet declare (docs/API2-MIGRATION.md and the gap register
- * UC-1 to UC-3 name what). Their working code stays in tiles.ts, radius.ts and
- * tracking.ts with its tests, as the specification the game's declarations
- * must match. Until the game provides them, `start` says in the log that the
- * rule is on and does nothing, so a toggle that is on never fails silently.
+ * THREE RULES ARE DECLARATIONS THE GAME APPLIES. Tile assignments by sheet
+ * cell, the blast radius clamp and the restored-level tracking are policy
+ * tables (`tileMap`, `projectionRadiusClamp`, `levelRevisitTracking`), returned
+ * from `policies` while their toggles are on. The game does the work: the mod
+ * never touches a tile, a blast or a level. tiles.ts, radius.ts and tracking.ts
+ * stay as the specification the tests hold the game's behaviour to.
  */
 
-import type { Api2HookContext, Api2Hooks, Api2ModDefinition, ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
+import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
 import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
-
-/** The rules this game's mod API 2 cannot carry yet, each with the register row that asks for it. */
-const WAITING: Readonly<Record<string, string>> = {
-  "catchup.tiles": "UC-1",
-  "catchup.projections": "UC-2",
-  "catchup.levelRevisitTracking": "UC-3",
-};
+import { CATCHUP_TILE_RULES } from "./tile-rules";
 
 export default {
   api: ">=2.0.0 <3.0.0",
@@ -91,11 +84,16 @@ export default {
     return out;
   },
 
-  start(mod: ModApi2): void {
-    for (const [flag, row] of Object.entries(WAITING)) {
-      if (mod.meta.flags[flag] === true) {
-        mod.meta.log(`${flag} is on, but this game cannot apply it yet (gap ${row}), so it changes nothing`);
-      }
-    }
+  /*
+   * The DECLARATION half: tables the game applies itself, asked with the same
+   * resolved flags. A table whose toggle is off is absent, so the game takes
+   * its faithful path.
+   */
+  policies({ flags }: Api2HookContext): Api2Policies {
+    return {
+      ...(flags["catchup.tiles"] === true ? { tileMap: CATCHUP_TILE_RULES } : {}),
+      ...(flags["catchup.projections"] === true ? { projectionRadiusClamp: true } : {}),
+      ...(flags["catchup.levelRevisitTracking"] === true ? { levelRevisitTracking: true } : {}),
+    };
   },
 } satisfies Api2ModDefinition;

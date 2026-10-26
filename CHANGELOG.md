@@ -24,6 +24,10 @@ were not retagged.
 
 ## [Unreleased]
 
+### Changed
+
+- [Visible] [Modding-API] **Runs on mod API 2 and needs engine 1.22.0 or newer.** The tile, projection, and restored-level rules are declarations the game applies itself, so the mod now asks for three permissions (tiles, projections, monster tracking) that you grant once on the Mods screen. Every rule does what it did before.
+
 ### Removed
 
 - [Internal] **Removed this repo's own Discord release announcer.** Its workflow, script and test are gone. The releases site at releases.rpgm.tools now posts each new release to the Neo Angband announcements forum.

@@ -42,6 +42,8 @@ import type {
 import * as neoCore from "@rpgm-tools/neo-angband-core";
 import { validateManifest } from "@rpgm-tools/neo-angband-mod-sdk";
 import plugin from "./plugin";
+import { api2PolicyEffects, type Api2TileFill } from "@rpgm-tools/neo-angband-mod-sdk";
+import { CATCHUP_TILE_RULES } from "./tile-rules";
 import { CATCHUP_TILE_SETS, applyCatchupTiles, catchupTileSetFor } from "./tiles";
 
 /* ------------------------------------------------------------------ *
@@ -350,13 +352,49 @@ describe("an assignment already in the map wins", () => {
  * The plugin and this rule.
  * ------------------------------------------------------------------ */
 
-describe("the mod's entry point", () => {
-  it("installs no tile filler yet, whether the rule is on or off", () => {
-    /* mod API 2 has no tile declaration by sheet cell (gap register UC-1), so
-     * the rule is inert until the game provides one. applyCatchupTiles and
-     * CATCHUP_TILE_SETS are the specification that declaration must match. */
-    for (const flags of [{ "catchup.tiles": true }, { "catchup.tiles": false }, {}]) {
-      expect(plugin.hooks({ id: "upstream-catchup", flags })).toEqual({});
+describe("the mod's tile declaration", () => {
+  /** The filler the game installs from the mod's table, run over one pack. */
+  function declaredFor(id: string): FakeFill {
+    const fill = new FakeFill(sheet(id));
+    const { registrations } = api2PolicyEffects({ tileMap: CATCHUP_TILE_RULES });
+    registrations.tileFiller?.(fill as unknown as Api2TileFill);
+    return fill;
+  }
+
+  it("draws exactly what the verbatim upstream blocks draw, pack by pack", () => {
+    /* applyCatchupTiles parses upstream's own text with the engine's .prf
+     * grammar; the table is the same assignments as plain indices and cells. A
+     * name that stopped resolving to its index would fail here. */
+    for (const set of CATCHUP_TILE_SETS) {
+      const spec = fillFor(set.pack);
+      const declared = declaredFor(set.pack);
+      expect([...declared.monsters], set.sha).toEqual([...spec.monsters]);
+      expect([...declared.objects], set.sha).toEqual([...spec.objects]);
+    }
+  });
+
+  it("writes nothing into a pack no commit named, or into a loose pack", () => {
+    for (const id of ["old", "shockbolt-light", "somebody-elses-pack"]) {
+      const fill = declaredFor(id);
+      expect(fill.monsters.size + fill.objects.size, id).toBe(0);
+    }
+    const loose = new FakeFill({ engine: "linoleum", id: "gervais", menuname: "David Gervais' tiles (neo-linoleum)" });
+    api2PolicyEffects({ tileMap: CATCHUP_TILE_RULES }).registrations.tileFiller?.(loose as unknown as Api2TileFill);
+    expect(loose.monsters.size + loose.objects.size).toBe(0);
+  });
+
+  it("replaces nothing a pack already draws", () => {
+    const fill = new FakeFill(sheet("adam-bolt"));
+    const witch = ridxOf("witch");
+    fill.monsters.set(witch, { attr: 0x81, char: 0x81 });
+    api2PolicyEffects({ tileMap: CATCHUP_TILE_RULES }).registrations.tileFiller?.(fill as unknown as Api2TileFill);
+    expect(fill.monsterTile(witch)).toEqual({ attr: 0x81, char: 0x81 });
+    expect(fill.monsters.size + fill.objects.size).toBe(8);
+  });
+
+  it("installs no filler while the rule is off", () => {
+    for (const flags of [{ "catchup.tiles": false }, {}]) {
+      expect(plugin.policies({ id: "upstream-catchup", flags })).toEqual({});
     }
     expect(plugin).not.toHaveProperty("register");
   });
@@ -382,15 +420,15 @@ describe("manifest.json", () => {
     expect(() => validateManifest(document)).not.toThrow();
   });
 
-  it("declares the schema 2 manifest on API 2 with no grant", () => {
+  it("declares the schema 2 manifest on API 2 with the three registry grants its tables need", () => {
     expect(document.format).toBe("neo-angband/mod/manifest");
     expect(document.schemaVersion).toBe(2);
     expect(document.data.runtime).toBe("in-process");
     expect(document.data.api).toBe(">=2.0.0 <3.0.0");
     expect(() => validateManifest(document)).not.toThrow();
-    /* The hooks this mod declares need no permission. registry:tiles returns
-     * with the tile declaration (gap register UC-1). */
-    expect(manifest.capabilities ?? []).toEqual([]);
+    /* The hooks need no permission; the three tables do (tileMap, the blast
+     * radius clamp, the restored-level tracking). */
+    expect([...(manifest.capabilities ?? [])].sort()).toEqual(["registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("declares the flags the plugin reads, and defaults every one of them off", () => {

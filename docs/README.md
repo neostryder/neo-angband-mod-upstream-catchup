@@ -24,10 +24,10 @@ switch has no flag of its own, the game knows it by its section id instead.
 
 ## What it needs
 
-- **Engine:** `>=1.18.0`
+- **Engine:** `>=1.22.0`
 - **Shape:** `content`
 - **Facets:** `content`, `plugin`
-- **Capabilities:** `registry:tiles`
+- **Capabilities:** `registry:tiles`, `registry:projection`, `registry:monster`
 
 What a capability string permits, and what a mod that asks for one cannot do
 without it, is in [the mod lifecycle
