@@ -42,12 +42,39 @@ function learnShapeObviousFlagsDirectly() {
   return true;
 }
 
+// tile-rules.ts
+var CATCHUP_TILE_RULES = [
+  /* 7e8b58325: David Gervais' tiles */
+  { monster: 322, cell: [47, 19], packs: ["gervais"] },
+  // Beorn, the Mountain Bear
+  /* 2e9703d42: Shockbolt Dark and Light, one pack directory */
+  { object: 136, cell: [84, 0], packs: ["shockbolt"] },
+  // Knight's Shield
+  /* 9b04b692d: Nomad's tiles */
+  { object: 18, cell: [16, 10], packs: ["nomad"] },
+  // Sip of Miruvor
+  { object: 20, cell: [17, 10], packs: ["nomad"] },
+  // Draught of the Ents
+  /* 655812a54: Adam Bolt's tiles */
+  { object: 18, cell: [7, 14], packs: ["adam-bolt"] },
+  // Sip of Miruvor
+  { monster: 15, cell: [7, 51], packs: ["adam-bolt"] },
+  // red-hatted elf
+  { monster: 16, cell: [8, 51], packs: ["adam-bolt"] },
+  // Father Christmas
+  { monster: 156, cell: [12, 50], packs: ["adam-bolt"] },
+  // witch
+  { monster: 161, cell: [2, 57], packs: ["adam-bolt"] },
+  // old forest tree
+  { monster: 223, cell: [6, 56], packs: ["adam-bolt"] },
+  // blackguard
+  { monster: 236, cell: [3, 56], packs: ["adam-bolt"] },
+  // Old Man Willow
+  { monster: 403, cell: [2, 50], packs: ["adam-bolt"] }
+  // dunadan of Angmar
+];
+
 // plugin.ts
-var WAITING = {
-  "catchup.tiles": "UC-1",
-  "catchup.projections": "UC-2",
-  "catchup.levelRevisitTracking": "UC-3"
-};
 var plugin_default = {
   api: ">=2.0.0 <3.0.0",
   /*
@@ -66,12 +93,17 @@ var plugin_default = {
     }
     return out;
   },
-  start(mod) {
-    for (const [flag, row] of Object.entries(WAITING)) {
-      if (mod.meta.flags[flag] === true) {
-        mod.meta.log(`${flag} is on, but this game cannot apply it yet (gap ${row}), so it changes nothing`);
-      }
-    }
+  /*
+   * The DECLARATION half: tables the game applies itself, asked with the same
+   * resolved flags. A table whose toggle is off is absent, so the game takes
+   * its faithful path.
+   */
+  policies({ flags }) {
+    return {
+      ...flags["catchup.tiles"] === true ? { tileMap: CATCHUP_TILE_RULES } : {},
+      ...flags["catchup.projections"] === true ? { projectionRadiusClamp: true } : {},
+      ...flags["catchup.levelRevisitTracking"] === true ? { levelRevisitTracking: true } : {}
+    };
   }
 };
 export {

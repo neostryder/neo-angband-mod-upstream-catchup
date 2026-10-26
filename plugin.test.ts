@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { apiRangeVerdict, checkApi2Policies, type Api2Hooks, type ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
+import { api2PolicyEffects, apiRangeVerdict, checkApi2Policies, type Api2Hooks, type Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
 import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import plugin from "./plugin";
@@ -11,11 +11,8 @@ function hooksFor(flags: Readonly<Record<string, boolean>>): Api2Hooks {
   return plugin.hooks({ id: "upstream-catchup", flags }) ?? {};
 }
 
-function startWith(flags: Readonly<Record<string, boolean>>): string[] {
-  const lines: string[] = [];
-  const mod = { meta: { flags, log: (line: string) => lines.push(line) } } as unknown as ModApi2;
-  plugin.start(mod);
-  return lines;
+function policiesFor(flags: Readonly<Record<string, boolean>>): Api2Policies {
+  return plugin.policies({ id: "upstream-catchup", flags });
 }
 
 describe("the API 2 definition", () => {
@@ -47,24 +44,35 @@ describe("the API 2 definition", () => {
     expect(hooks.effectIntro?.(intro)).toBe("It requires a target. When used, it ");
   });
 
-  it("contributes nothing for the three rules the game cannot carry yet", () => {
+  it("contributes no hook for the three rules the game applies from a table", () => {
     expect(hooksFor({ "catchup.tiles": true, "catchup.projections": true, "catchup.levelRevisitTracking": true })).toEqual({});
   });
 
-  it("declares no policy table", () => {
-    expect(plugin).not.toHaveProperty("policies");
-    expect(checkApi2Policies({})).toBeNull();
+  it("declares no table when every rule is off or absent", () => {
+    expect(policiesFor({})).toEqual({});
+    expect(policiesFor(Object.fromEntries(RULES.map((r) => [r, false])))).toEqual({});
+    expect(policiesFor({ "catchup.text": true, "catchup.shapeFlags": true })).toEqual({});
   });
 
-  it("says in the log which waiting rules are on, and only those", () => {
-    expect(startWith({})).toEqual([]);
-    expect(startWith({ "catchup.text": true, "catchup.shapeFlags": true })).toEqual([]);
-    const lines = startWith({ "catchup.tiles": true, "catchup.projections": false, "catchup.levelRevisitTracking": true });
-    expect(lines).toHaveLength(2);
-    expect(lines[0]).toContain("catchup.tiles");
-    expect(lines[0]).toContain("UC-1");
-    expect(lines[1]).toContain("catchup.levelRevisitTracking");
-    expect(lines[1]).toContain("UC-3");
+  it("declares each waiting rule's table when its toggle is on, and only that one", () => {
+    expect(Object.keys(policiesFor({ "catchup.tiles": true }))).toEqual(["tileMap"]);
+    expect(policiesFor({ "catchup.projections": true })).toEqual({ projectionRadiusClamp: true });
+    expect(policiesFor({ "catchup.levelRevisitTracking": true })).toEqual({ levelRevisitTracking: true });
+    expect(Object.keys(policiesFor({ "catchup.tiles": true, "catchup.projections": true, "catchup.levelRevisitTracking": true })).sort()).toEqual(["levelRevisitTracking", "projectionRadiusClamp", "tileMap"]);
+  });
+
+  it("declares tables the game accepts, and installs the game's three seams from them", () => {
+    const all = policiesFor({ "catchup.tiles": true, "catchup.projections": true, "catchup.levelRevisitTracking": true });
+    expect(checkApi2Policies(all)).toBeNull();
+    const { registrations } = api2PolicyEffects(all);
+    expect(registrations.projectionRadiusClamp).toBe(true);
+    expect(registrations.levelRevisitTracking).toBe(true);
+    expect(typeof registrations.tileFiller).toBe("function");
+  });
+
+  it("asks only for the grants those tables need", () => {
+    const manifest = JSON.parse(readFileSync(new URL("./manifest.json", import.meta.url), "utf8")) as { data: { capabilities: string[] } };
+    expect(manifest.data.capabilities.sort()).toEqual(["registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("matches the manifest: every rule it names exists there with the same flag", () => {
