@@ -4,7 +4,7 @@
   "data": {
     "id": "upstream-catchup",
     "name": "Upstream Catchup",
-    "version": "1.2.0",
+    "version": "1.3.0-beta.1",
     "api": ">=2.0.0 <3.0.0",
     "runtime": "in-process",
     "engine": {
