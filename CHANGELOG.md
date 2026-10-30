@@ -24,6 +24,8 @@ were not retagged.
 
 ## [Unreleased]
 
+## 1.3.0-beta.1 - 2026-10-30
+
 ### Changed
 
 - [Visible] [Modding-API] **Runs on mod API 2 and needs engine 1.22.0 or newer.** The tile, projection, and restored-level rules are declarations the game applies itself, so the mod now asks for three permissions (tiles, projections, monster tracking) that you grant once on the Mods screen. Every rule does what it did before.
