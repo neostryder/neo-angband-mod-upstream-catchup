@@ -441,8 +441,8 @@ describe("manifest.json", () => {
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);
   });
 
-  it("floors the engine at 1.22.0, the build that runs mod API 2 from a mod folder", () => {
-    expect(manifest.engine).toBe(">=1.22.0");
+  it("floors the engine at 1.23.0-beta.1, the build that runs mod API 2 from a mod folder", () => {
+    expect(manifest.engine).toBe(">=1.23.0-beta.1");
   });
 
   it("carries the version package.json carries", () => {
