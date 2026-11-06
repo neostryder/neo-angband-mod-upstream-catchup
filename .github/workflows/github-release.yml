@@ -41,7 +41,7 @@ jobs:
             --notes-file "$RUNNER_TEMP/release-notes.md"
             --verify-tag
           )
-          if [[ "$TAG" == v0.* ]]; then
+          if [[ "$TAG" == v0.* || "$TAG" == *-* ]]; then
             args+=(--prerelease)
           fi
           gh release create "${args[@]}"
