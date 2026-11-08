@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
-import ts from "typescript";
+import ts from "@typescript/typescript6";
 
 /**
  * The mod reads no engine member. Its sources import the game's packages for
