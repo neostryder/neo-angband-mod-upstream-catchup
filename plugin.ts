@@ -46,7 +46,7 @@ import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { CATCHUP_TILE_RULES } from "./tile-rules";
 
 export default {
-  api: ">=2.0.0 <3.0.0",
+  api: ">=2.2.0 <3.0.0",
 
   start(mod: ModApi2): void {
     if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;

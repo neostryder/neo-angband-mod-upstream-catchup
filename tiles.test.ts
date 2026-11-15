@@ -424,7 +424,7 @@ describe("manifest.json", () => {
     expect(document.format).toBe("neo-angband/mod/manifest");
     expect(document.schemaVersion).toBe(2);
     expect(document.data.runtime).toBe("in-process");
-    expect(document.data.api).toBe(">=2.0.0 <3.0.0");
+    expect(document.data.api).toBe(">=2.2.0 <3.0.0");
     expect(() => validateManifest(document)).not.toThrow();
     /* The menu label uses the published engine registry at startup. */
     expect([...(manifest.capabilities ?? [])].sort()).toEqual(["engine:access", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);

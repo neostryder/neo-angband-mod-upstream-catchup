@@ -127,7 +127,7 @@ var CATCHUP_TILE_RULES = [
 
 // plugin.ts
 var plugin_default = {
-  api: ">=2.0.0 <3.0.0",
+  api: ">=2.2.0 <3.0.0",
   start(mod) {
     if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;
     const menus = mod.engine?.registry?.menus;
