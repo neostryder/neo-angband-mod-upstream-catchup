@@ -10,8 +10,9 @@
  * WHAT BELONGS HERE, AND WHAT BELONGS TO `bug-fixes`
  * ------------------------------------------------------------------
  *
- * Content, balance, and feature changes belong here, cited by upstream SHA.
- * Bug fixes, including ambiguous commits, belong to `bug-fixes`.
+ * Content, balance, and feature changes from upstream belong here, each cited
+ * by its upstream SHA. Bug fixes belong to `bug-fixes`, including fixes upstream
+ * has accepted and commits whose class is unclear.
  *
  * This mod deletes itself the day core rebaselines onto a newer upstream tag,
  * because everything in it will already be in the game.

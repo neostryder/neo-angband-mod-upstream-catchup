@@ -37,7 +37,7 @@ flowchart TD
 
 *Source of truth: `README.md` for the mod boundary and `manifest.json` for the six toggles.*
 
-Content, balance, and feature changes belong here, cited by upstream SHA. Bug fixes and ambiguous commits belong to [Bug Fixes](https://github.com/neostryder/neo-angband-mod-bug-fixes), including fixes accepted upstream. The existing carried rules remain listed below; the current review and routing decisions are in [the upstream ledger](docs/UPSTREAM.md).
+This mod carries content, balance, and feature changes from upstream, each cited by its upstream SHA. Bug fixes go to [Bug Fixes](https://github.com/neostryder/neo-angband-mod-bug-fixes), including fixes upstream has accepted and commits whose class is unclear. The rules this mod already carries are listed below, and [the upstream ledger](docs/UPSTREAM.md) has the current review and where each commit goes.
 
 ## What is in it
 
@@ -52,17 +52,17 @@ See the [settings reference](SETTINGS.md) for every flag, its default, and when 
 | **Post-4.2.6 projection corrections** (`catchup.projections`) | 1 upstream commit, July 2026 | Corrections to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (commit `f0f6bd223`, upstream issue [#6671](https://github.com/angband/angband/issues/6671)). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, reaches the case this covers. Needs the engine release that added the projection-radius seam; on an older engine the row is inert. |
 | **Post-4.2.6 shapechange flag learning** (`catchup.shapeFlags`) | 1 upstream commit, July 2026 | A correction to how taking on a shape teaches you what it grants. Today: a shape's obvious flags are learned directly, instead of only through whatever you have worn (commit `c8036c515`, raised in the comments on FAangband issue [#465](https://github.com/NickMcConnell/FAangband/issues/465)). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but the game never told you, because it only ever checked your equipment. This teaches exactly the same obvious flags the shape already reveals on assuming it, nothing broader. Needs the engine release that added the shape-flag-learning seam; on an older engine the row is inert. |
 | **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is separate from `bug-fixes`' in-play save/reload heatmap persistence, which keeps old tracking instead of discarding it. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
-| **Post-4.2.6 death mold hearing** (`catchup.deathMoldHearing`) | 1 upstream commit, August 2026 | Sets death mold hearing to 2 instead of 200 (`5da31305a`). |
+| **Post-4.2.6 death mold hearing** (`catchup.deathMoldHearing`) | 1 upstream commit, August 2026 | Sets death mold hearing to 2 instead of 200 (`5da31305a`), without that commit's noise-propagation optimization. |
 
-The text section also carries the descriptions, messages, symbol help, and equipment-comparison wording from `73c851ab4` and `c6e499b5a`, plus the disarm command label from `43ae88cd9`. Each content patch has a test against the installed Core string. The ledger lists the six spelling-only changes omitted to keep en_US spelling.
+The `catchup.text` toggle also carries description, message, symbol help, and equipment-comparison wording from `73c851ab4` and `c6e499b5a`, and it relabels the disarm command to mention locking doors (`43ae88cd9`). Six spelling-only upstream changes are left out to keep en_US spelling, and [the upstream ledger](docs/UPSTREAM.md) lists them.
 
-The `catchup.deathMoldHearing` section sets death mold hearing to 2 instead of 200 (`5da31305a`). It has its own default-off setting and does not include the noise-propagation optimization from that commit. The text section uses the published menu registry to rename the disarm command; its `engine:access` grant reads no live state.
+The disarm rename goes through the engine's menu registry, and the toggle's `engine:access` grant reads no live game state. Each text patch has a test against the installed Core string.
 
 Every toggle defaults to off, unlike in the `bug-fixes` mod. Core is 4.2.6, someone who installed the game did not ask for anything later than that, and a change arriving switched on would amount to the port adding something.
 
 ### One row per upstream commit
 
-The table below records the older carried set. The [upstream ledger](docs/UPSTREAM.md) records all subsequent commits through `42cd156ac`.
+These rows cover the older carried set, each with the upstream commit it comes from.
 
 | Upstream commit | Date | What it did | Tile set | In this mod |
 | --- | --- | --- | --- | --- |
@@ -80,7 +80,7 @@ The table below records the older carried set. The [upstream ledger](docs/UPSTRE
 | [`c8036c515`](https://github.com/angband/angband/commit/c8036c51537942a560e3d7f81749c431bbb4701f) | 2026-07-21 | Learn a shapechange's obvious flags directly, instead of only through worn equipment | n/a (`src/obj-knowledge.c`, not a tile) | Yes, under `catchup.shapeFlags` |
 | [`5c45eb958`](https://github.com/angband/angband/commit/5c45eb9588b8227d4f1b1998e0a627ad7ee11a75) | 2026-08-18 | Remembers the source for reload noise reconstruction, and clears stale noise / ages scent when a frozen level returns | n/a (`game-world.c`, `generate.c`, `load.c`, `save.c`, `ui-game.c`) | Yes, level-revisit half under `catchup.levelRevisitTracking`; its reload design remains separate from `bug-fixes` |
 
-The table above records the older carried set. The [upstream ledger](docs/UPSTREAM.md) records subsequent reviews, including the Bug Fixes and Borg routing lists.
+Later commits through `42cd156ac`, including the ones that go to Bug Fixes or the Borg mod, are classified in the [upstream ledger](docs/UPSTREAM.md).
 
 ### A known interaction with the `bug-fixes` mod
 
@@ -211,7 +211,7 @@ flowchart TD
 
 *Source of truth: `README.md` and `manifest.json`. Retirement is a maintenance policy, not something the code enforces.*
 
-The [upstream ledger](docs/UPSTREAM.md) classifies every commit after `5c45eb958` through `42cd156ac`, including all 21 commits after the adopted October review head. It records the carried content, Core gaps, and Bug Fixes and Borg routing lists. The next review starts after `42cd156ac`.
+The [upstream ledger](docs/UPSTREAM.md) classifies all 96 upstream commits after `5c45eb958` through `42cd156ac`, including the 21 after the October review head. It also lists Core gaps and the commits that go to Bug Fixes or the Borg mod. The next review starts after `42cd156ac`.
 
 ## A note on scores
 
