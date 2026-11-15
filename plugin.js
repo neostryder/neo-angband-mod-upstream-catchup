@@ -1,6 +1,33 @@
 // upstream-catchup - generated from plugin.ts by neo-angband-mod-build
 // (@rpgm-tools/neo-angband-mod-sdk). Edit the TypeScript source, not this file.
 
+// text-rules.json
+var text_rules_default = {
+  messages: [
+    ["The monster can not move.", "The monster cannot move."],
+    ["The dungeon does not appear to extend deeper", "The dungeon does not appear to extend deeper."],
+    ["The item cannot be used at the moment", "The item cannot be used at the moment."],
+    ["The ground shakes! The ceiling caves in!", "The ground shakes!  The ceiling caves in!"],
+    ["Bad effect passed to effect_do(). Please report this bug.", "Bad effect passed to effect_do().  Please report this bug."],
+    ["Warning! Could not allocate a new monster.", "Warning!  Could not allocate a new monster."],
+    ["Oops! It feels deathly cold!", "Oops!  It feels deathly cold!"],
+    ["lore save failed!", "Lore save failed!"],
+    ["death save failed!", "Death save failed!"]
+  ],
+  symbols: [
+    ["picked up such as treasure, weapons, magical devices, etc; and creatures", "picked up such as treasure, weapons, magical devices, etc.; and Creatures"],
+    ["character's well being.", "character's well-being."],
+    ['symbols are used to represent entities in more than one category. The "@"', 'symbols are used to represent entities in more than one category.  The "@"'],
+    ["Entrance to Weapon Smith", "Entrance to Weapon Smiths"],
+    ["Lights, Tools, Chests, etc", "Lights, Tools, Chests, etc."]
+  ],
+  commandMenu: ["Disarm a trap or chest", "Disarm a trap/chest; lock door"],
+  filterPrompt: [
+    "Enter 2 or 3 (for stat) character code and return or return to clear ",
+    "Enter 2-character code (3 for a stat) and Return, or just Return to clear "
+  ]
+};
+
 // item-text.ts
 var AFFECTS_LINE = /^Affects your ([^\n]*[^.\n])\n$/;
 function catchupObjectInfoText(text) {
@@ -36,6 +63,30 @@ function catchupEffectIntro(intro) {
       return `${target}When used, it `;
   }
 }
+function catchupMessageText(text) {
+  const exact = text_rules_default.messages.find(([before]) => text === before);
+  if (exact) return exact[1];
+  const theft = /^You steal (\d+) gold pieces worth of treasure\.$/.exec(text);
+  if (theft) return `You steal treasure worth ${theft[1]} gold pieces.`;
+  if (/^That (staff|wand) had no useable energy$/.test(text)) return `${text}.`;
+  return text;
+}
+function catchupScreenText(text, site) {
+  if (site.screen === "core:help-symbols") {
+    return text_rules_default.symbols.find(([before]) => text === before)?.[1] ?? text;
+  }
+  if (site.screen === "core:prompt" && site.part === "prompt" && text === text_rules_default.filterPrompt[0]) {
+    return text_rules_default.filterPrompt[1];
+  }
+  if (site.screen === "core:equip-cmp-select-help" && site.part === "cell" && site.column === "desc1" && site.row?.["key1"] === "n, PgDn" && text === "move selection one page up") {
+    return "move selection one page down";
+  }
+  return text;
+}
+var catchupCommandMenuText = (id, rows) => {
+  if (id !== "core:keypress-command-table") return rows;
+  return rows.map((row) => row.semantic.kind === "keypress-command" && row.semantic.data?.["originalKey"] === "D" && row.label === text_rules_default.commandMenu[0] ? { ...row, label: text_rules_default.commandMenu[1] } : row);
+};
 
 // shape-flags.ts
 function learnShapeObviousFlagsDirectly() {
@@ -77,6 +128,14 @@ var CATCHUP_TILE_RULES = [
 // plugin.ts
 var plugin_default = {
   api: ">=2.0.0 <3.0.0",
+  start(mod) {
+    if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;
+    const menus = mod.engine?.registry?.menus;
+    if (!menus) return;
+    const id = "core:keypress-command-table";
+    const previous = menus.handlerFor(id);
+    menus.register(id, (menu, rows) => catchupCommandMenuText(menu, previous?.(menu, rows) ?? rows));
+  },
   /*
    * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own
    * resolved flags, asked once when content composes, and it must be free of
@@ -90,6 +149,8 @@ var plugin_default = {
     if (flags["catchup.text"] === true) {
       out.objectInfoText = catchupObjectInfoText;
       out.effectIntro = catchupEffectIntro;
+      out.messageText = catchupMessageText;
+      out.screenText = catchupScreenText;
     }
     return out;
   },

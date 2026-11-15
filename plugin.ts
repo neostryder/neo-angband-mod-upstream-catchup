@@ -10,12 +10,9 @@
  * WHAT BELONGS HERE, AND WHAT BELONGS TO `bug-fixes`
  * ------------------------------------------------------------------
  *
- * One question decides it: does an accepted upstream commit exist for this
- * change? Yes, and it is this mod's, cited by SHA. No, and it is the
- * `bug-fixes` mod's, cited by issue or by measurement. A fix that upstream
- * later accepts MOVES here at the next release, which is the point of the split
- * rather than an inconvenience: this set is finite and expires, and that one is
- * open-ended and permanent.
+ * Content, balance, and feature changes from upstream belong here, each cited
+ * by its upstream SHA. Bug fixes belong to `bug-fixes`, including fixes upstream
+ * has accepted and commits whose class is unclear.
  *
  * This mod deletes itself the day core rebaselines onto a newer upstream tag,
  * because everything in it will already be in the game.
@@ -24,8 +21,8 @@
  * ENTRY POINT CONTRACT
  * ------------------------------------------------------------------
  *
- * The default export is a mod API 2 definition. The mod reads no engine
- * member: `hooks` is handed its resolved rule flags and returns plain
+ * The default export is a mod API 2 definition. Startup uses the published
+ * menu registry; `hooks` is handed its resolved rule flags and returns plain
  * functions of plain data, so this file imports the SDK for TYPES ONLY. A
  * module fetched from a folder cannot resolve a bare specifier, and a bundled
  * copy of the SDK would only add a second copy of its module state.
@@ -43,13 +40,22 @@
  * stay as the specification the tests hold the game's behaviour to.
  */
 
-import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
-import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
+import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies, ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
+import { catchupCommandMenuText, catchupEffectIntro, catchupMessageText, catchupObjectInfoText, catchupScreenText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { CATCHUP_TILE_RULES } from "./tile-rules";
 
 export default {
   api: ">=2.0.0 <3.0.0",
+
+  start(mod: ModApi2): void {
+    if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;
+    const menus = mod.engine?.registry?.menus;
+    if (!menus) return;
+    const id = "core:keypress-command-table";
+    const previous = menus.handlerFor(id);
+    menus.register(id, (menu, rows) => catchupCommandMenuText(menu, previous?.(menu, rows) ?? rows));
+  },
 
   /*
    * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own
@@ -79,6 +85,8 @@ export default {
     if (flags["catchup.text"] === true) {
       out.objectInfoText = catchupObjectInfoText;
       out.effectIntro = catchupEffectIntro;
+      out.messageText = catchupMessageText;
+      out.screenText = catchupScreenText;
     }
 
     return out;

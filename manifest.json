@@ -21,7 +21,9 @@
     "capabilities": [
       "registry:tiles",
       "registry:projection",
-      "registry:monster"
+      "registry:monster",
+      "registry:menu",
+      "engine:access"
     ],
     "description": "Opt-in changes from upstream Angband development after 4.2.6, the tag this port is pinned to. Each kind of change has its own toggle and cites the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nOnce core rebaselines onto a newer upstream tag, everything here is already in the game and the mod deletes itself.",
     "author": "neostryder",
@@ -61,10 +63,17 @@
     ],
     "sections": [
       {
+        "id": "catchup-death-mold-hearing",
+        "flag": "catchup.deathMoldHearing",
+        "title": "Post-4.2.6 death mold hearing",
+        "description": "Death molds have a hearing of 2 instead of 200 (5da31305a).",
+        "default": false
+      },
+      {
         "id": "catchup-text",
         "flag": "catchup.text",
         "title": "Post-4.2.6 text corrections",
-        "description": "Brings in wording upstream corrected after 4.2.6. The Trident 'of Wrath' description spells the Maia's name Ossë. The Priest's Light of Manwë becomes Light of Varda, and the blessed property is blessed by the Valar instead of the gods. Vampire Strike says how many hitpoints it drains. In item descriptions, an \"Affects your\" line ends with a full stop, an effect you must aim says \"It requires a target.\", and wands, staffs, rods and activated items say \"When used\". The README cites the upstream commit behind each one. Only the text changes, and the item-description wording needs a recent engine release.",
+        "description": "Brings in wording upstream corrected after 4.2.6. The Trident 'of Wrath' description spells the Maia's name Ossë. The Priest's Light of Manwë becomes Light of Varda, and the blessed property is blessed by the Valar instead of the gods. Vampire Strike says how many hitpoints it drains. In item descriptions, an \"Affects your\" line ends with a full stop, an effect you must aim says \"It requires a target.\", and wands, staffs, rods and activated items say \"When used\". This setting also updates the wording of descriptions, messages, symbol help, and equipment comparisons (73c851ab4, c6e499b5a). The disarm command's label mentions locking doors (43ae88cd9). The README cites the upstream commit behind each one. Only the text changes, and the item-description wording needs a recent engine release.",
         "default": false
       }
     ],

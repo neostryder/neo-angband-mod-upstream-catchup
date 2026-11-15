@@ -1,0 +1,152 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:3--100": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "You are a well-liked child.  "
+            ]
+          }
+        ],
+        "core:18--100": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "You are a well-liked child.  "
+            ]
+          }
+        ],
+        "core:4--15": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "Your mother was of the Avari.  "
+            ]
+          }
+        ],
+        "core:4--30": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "Your father was of the Avari.  "
+            ]
+          }
+        ],
+        "core:4--50": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "Your mother was of the Nandor.  "
+            ]
+          }
+        ],
+        "core:20--20": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "and it is acknowledged.  You are the adopted child "
+            ]
+          }
+        ],
+        "core:20--100": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "but it is unacknowledged.  You are the adopted child "
+            ]
+          }
+        ],
+        "core:24--15": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 3 pups.  "
+            ]
+          }
+        ],
+        "core:24--40": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 4 pups.  "
+            ]
+          }
+        ],
+        "core:24--70": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 5 pups.  "
+            ]
+          }
+        ],
+        "core:24--85": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 6 pups.  "
+            ]
+          }
+        ],
+        "core:24--95": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 7 pups.  "
+            ]
+          }
+        ],
+        "core:24--100": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "a litter of 8 pups.  "
+            ]
+          }
+        ],
+        "core:26--20": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "and your mother was a prisoner of war.  "
+            ]
+          }
+        ],
+        "core:26--95": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "and your mother was a cook.  "
+            ]
+          }
+        ],
+        "core:26--100": [
+          {
+            "op": "set",
+            "path": "phrase",
+            "value": [
+              "and your mother was one of the Chief's harem.  "
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

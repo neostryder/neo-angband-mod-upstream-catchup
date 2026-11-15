@@ -9,3 +9,4 @@ Settings that work as hooks (`catchup.projections`, `catchup.shapeFlags`, `catch
 | `catchup.shapeFlags` | off | Learns a shapechange's obvious flags directly. | No |
 | `catchup.levelRevisitTracking` | off | Clears old noise and ages scent when revisiting a level. | No |
 | `catchup.text` | off | Corrects selected wording from later upstream releases. | Yes |
+| `catchup.deathMoldHearing` | off | Sets death mold hearing to 2 instead of 200. | Yes |

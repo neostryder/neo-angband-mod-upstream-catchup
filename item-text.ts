@@ -17,6 +17,10 @@
  * only from the facts core passes in, and return anything else unchanged.
  */
 
+import type { Api2ScreenTextSite } from "@rpgm-tools/neo-angband-mod-sdk";
+import type { MenuTransformer } from "@rpgm-tools/neo-angband-core";
+import textRules from "./text-rules.json";
+
 /**
  * What core's effectIntro hook passes, restated structurally so this file
  * compiles against an engine that predates the seam. It matches core's
@@ -86,3 +90,41 @@ export function catchupEffectIntro(intro: EffectIntroFacts): string {
       return `${target}When used, it `;
   }
 }
+
+/** Upstream 73c851ab4 and c6e499b5a keep message matching literal except for numeric and item substitutions. */
+export function catchupMessageText(text: string): string {
+  const exact = textRules.messages.find(([before]) => text === before);
+  if (exact) return exact[1]!;
+
+  // steal_monster_item() changes the sentence around the existing gold amount.
+  const theft = /^You steal (\d+) gold pieces worth of treasure\.$/.exec(text);
+  if (theft) return `You steal treasure worth ${theft[1]} gold pieces.`;
+
+  // effect_handler_TAP_DEVICE() uses these two item names.
+  if (/^That (staff|wand) had no useable energy$/.test(text)) return `${text}.`;
+  return text;
+}
+
+/** Upstream display_equip_cmp_sel_help() needs the row key to distinguish Page Down from Page Up. */
+export function catchupScreenText(text: string, site: Api2ScreenTextSite): string {
+  if (site.screen === "core:help-symbols") {
+    return textRules.symbols.find(([before]) => text === before)?.[1] ?? text;
+  }
+  if (site.screen === "core:prompt" && site.part === "prompt" && text === textRules.filterPrompt[0]) {
+    return textRules.filterPrompt[1]!;
+  }
+  if (site.screen === "core:equip-cmp-select-help" && site.part === "cell" && site.column === "desc1" &&
+      site.row?.["key1"] === "n, PgDn" && text === "move selection one page up") {
+    return "move selection one page down";
+  }
+  return text;
+}
+
+/** Upstream 43ae88cd9's cmd_action[] supplies textui_action_menu_choose() with the door-locking label. */
+export const catchupCommandMenuText: MenuTransformer = (id, rows) => {
+  if (id !== "core:keypress-command-table") return rows;
+  return rows.map((row) => row.semantic.kind === "keypress-command" &&
+    row.semantic.data?.["originalKey"] === "D" && row.label === textRules.commandMenu[0]
+    ? { ...row, label: textRules.commandMenu[1]! }
+    : row);
+};
