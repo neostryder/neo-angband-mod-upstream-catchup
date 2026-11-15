@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import ts from "@typescript/typescript6";
 
 /**
- * The mod reads no engine member. Its sources import the game's packages for
+ * The mod uses the published menu registry at startup. Its sources import the game's packages for
  * types only, and the built plugin.js imports nothing from them at run time:
  * a module fetched from a folder cannot resolve a bare specifier, and a bundled
  * copy would be a second copy of the game's module state.

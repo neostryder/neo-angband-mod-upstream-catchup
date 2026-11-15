@@ -1,5 +1,12 @@
 {
   "sections": {
+    "catchup-death-mold-hearing": {
+      "fieldPatches": {
+        "core:death-mold": [
+          { "op": "set", "path": "hearing", "value": 2 }
+        ]
+      }
+    },
     "catchup-text": {
       "fieldPatches": {
         "core:aimless-looking-merchant": [

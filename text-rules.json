@@ -17,6 +17,7 @@
     ["Entrance to Weapon Smith", "Entrance to Weapon Smiths"],
     ["Lights, Tools, Chests, etc", "Lights, Tools, Chests, etc."]
   ],
+  "commandMenu": ["Disarm a trap or chest", "Disarm a trap/chest; lock door"],
   "filterPrompt": [
     "Enter 2 or 3 (for stat) character code and return or return to clear ",
     "Enter 2-character code (3 for a stat) and Return, or just Return to clear "

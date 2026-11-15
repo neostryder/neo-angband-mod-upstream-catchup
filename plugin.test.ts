@@ -1,11 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
-import { api2PolicyEffects, apiRangeVerdict, checkApi2Policies, type Api2Hooks, type Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
+import { api2PolicyEffects, apiRangeVerdict, checkApi2Policies, type Api2Hooks, type Api2Policies, type ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
+import type { MenuTransformer, MenuTransformRow } from "@rpgm-tools/neo-angband-core";
 import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import plugin from "./plugin";
 
-const RULES = ["catchup.tiles", "catchup.projections", "catchup.shapeFlags", "catchup.levelRevisitTracking", "catchup.text"] as const;
+const RULES = ["catchup.tiles", "catchup.projections", "catchup.shapeFlags", "catchup.levelRevisitTracking", "catchup.text", "catchup.deathMoldHearing"] as const;
 
 function hooksFor(flags: Readonly<Record<string, boolean>>): Api2Hooks {
   return plugin.hooks({ id: "upstream-catchup", flags }) ?? {};
@@ -70,9 +71,9 @@ describe("the API 2 definition", () => {
     expect(typeof registrations.tileFiller).toBe("function");
   });
 
-  it("asks only for the grants those tables need", () => {
+  it("asks for the table grants and the startup menu registry", () => {
     const manifest = JSON.parse(readFileSync(new URL("./manifest.json", import.meta.url), "utf8")) as { data: { capabilities: string[] } };
-    expect(manifest.data.capabilities.sort()).toEqual(["registry:monster", "registry:projection", "registry:tiles"]);
+    expect(manifest.data.capabilities.sort()).toEqual(["engine:access", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("matches the manifest: every rule it names exists there with the same flag", () => {
@@ -82,5 +83,56 @@ describe("the API 2 definition", () => {
     const declared = new Set([...(manifest.data.rules ?? []), ...(manifest.data.sections ?? [])].map((t) => t.flag));
     for (const flag of RULES) expect(declared.has(flag)).toBe(true);
     expect(manifest.data.api).toBe(plugin.api);
+  });
+});
+
+describe("upstream 43ae88cd9 command-menu wording", () => {
+  const rows: readonly MenuTransformRow[] = [
+    { id: "core:keypress-command:7", label: "Disarm a trap or chest", semantic: { kind: "keypress-command", data: { originalKey: "D", category: "Action commands" } } },
+    { id: "other", label: "Disarm a trap or chest", semantic: { kind: "keypress-command", data: { originalKey: "x" } } },
+    { id: "rest", label: "Rest for a while", semantic: { kind: "keypress-command", data: { originalKey: "R" } } },
+  ];
+
+  function start(flags: Record<string, boolean>, granted = true, previous: MenuTransformer | null = null): ReturnType<typeof vi.fn> {
+    const register = vi.fn();
+    plugin.start({
+      meta: { flags, granted: () => granted },
+      engine: { registry: { menus: { register, handlerFor: () => previous } } },
+    } as unknown as ModApi2);
+    return register;
+  }
+
+  it("changes only the disarm label and preserves command identity and semantics", () => {
+    const register = start({ "catchup.text": true });
+    expect(register).toHaveBeenCalledOnce();
+    const [id, transform] = register.mock.calls[0] as [string, MenuTransformer];
+    expect(id).toBe("core:keypress-command-table");
+    expect(transform(id, rows)).toEqual([
+      { ...rows[0], label: "Disarm a trap/chest; lock door" }, rows[1], rows[2],
+    ]);
+    expect(transform("other:menu", rows)).toBe(rows);
+    expect(rows[0]!.label).toBe("Disarm a trap or chest");
+  });
+
+  it("preserves an earlier transformer's labels", () => {
+    const previous: MenuTransformer = (_id, input) => input.map((row) => ({ ...row, label: "Earlier wording" }));
+    const register = start({ "catchup.text": true }, true, previous);
+    const transform = register.mock.calls[0]![1] as MenuTransformer;
+    expect(transform("core:keypress-command-table", rows).map((row) => row.label)).toEqual(rows.map(() => "Earlier wording"));
+  });
+
+  it("registers nothing when the setting is absent, off, or the grant is refused", () => {
+    expect(start({})).not.toHaveBeenCalled();
+    expect(start({ "catchup.text": false })).not.toHaveBeenCalled();
+    expect(start({ "catchup.text": true }, false)).not.toHaveBeenCalled();
+  });
+
+  it("reads no live state and tolerates an unavailable engine domain", () => {
+    expect(() => plugin.start({ meta: { flags: { "catchup.text": true }, granted: () => true } } as unknown as ModApi2)).not.toThrow();
+    const forbidden = (): never => { throw new Error("Unexpected engine read"); };
+    plugin.start({
+      meta: { flags: { "catchup.text": true }, granted: () => true },
+      engine: { get state() { return forbidden(); }, get core() { return forbidden(); }, get registries() { return forbidden(); }, registry: { menus: { handlerFor: () => null, register: vi.fn() } } },
+    } as unknown as ModApi2);
   });
 });

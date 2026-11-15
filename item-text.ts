@@ -18,6 +18,7 @@
  */
 
 import type { Api2ScreenTextSite } from "@rpgm-tools/neo-angband-mod-sdk";
+import type { MenuTransformer } from "@rpgm-tools/neo-angband-core";
 import textRules from "./text-rules.json";
 
 /**
@@ -118,3 +119,12 @@ export function catchupScreenText(text: string, site: Api2ScreenTextSite): strin
   }
   return text;
 }
+
+/** Upstream 43ae88cd9's cmd_action[] supplies textui_action_menu_choose() with the door-locking label. */
+export const catchupCommandMenuText: MenuTransformer = (id, rows) => {
+  if (id !== "core:keypress-command-table") return rows;
+  return rows.map((row) => row.semantic.kind === "keypress-command" &&
+    row.semantic.data?.["originalKey"] === "D" && row.label === textRules.commandMenu[0]
+    ? { ...row, label: textRules.commandMenu[1]! }
+    : row);
+};

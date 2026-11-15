@@ -18,7 +18,7 @@
 
 import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
-import { composePacks, expandSections, recordKey, resolveSectionState, type PackContent } from "@rpgm-tools/neo-angband-mod-sdk";
+import { composePacks, expandSections, recordKey, resolveSectionState, type JsonRecord, type PackContent } from "@rpgm-tools/neo-angband-mod-sdk";
 
 import artifactContrib from "./artifact.json";
 import classContrib from "./class.json";
@@ -30,7 +30,7 @@ const manifest = manifestDocument.data;
 const require = createRequire(import.meta.url);
 
 interface PackFile {
-  records: Record<string, unknown>[];
+  records: JsonRecord[];
 }
 
 function corePack(file: string): PackFile {
@@ -75,6 +75,31 @@ describe("catchup-text: Trident 'of Wrath' spells Ossë (upstream f1b1626f6)", (
     /* Nothing else about the sentence moved - this patch is the diaeresis and
      * nothing else, unlike bug-fixes' unrelated rewrite of the same field. */
     expect(after.replace("Ossë", "Osse")).toBe(before);
+  });
+});
+
+describe("catchup.deathMoldHearing: upstream 5da31305a", () => {
+  it("changes only death mold hearing through its own default-off section", () => {
+    const records = corePack("monster").records;
+    const baseline = records.find((record) => record["name"] === "death mold")!;
+    expect(baseline["hearing"]).toBe(200);
+    const contribution = require("./monster.json") as PackContent["files"][string];
+    const id = "catchup-death-mold-hearing";
+    const section = manifest.sections.find((entry) => entry.id === id);
+    expect(section).toMatchObject({ flag: "catchup.deathMoldHearing", default: false });
+    expect(contribution.sections?.[id]).toEqual({
+      fieldPatches: { "core:death-mold": [{ op: "set", path: "hearing", value: 2 }] },
+    });
+    const core: PackContent = { manifest: { id: "core", name: "Core", version: "4.2.6", shape: "content" }, files: { monster: { records } } };
+    const mod: PackContent = {
+      manifest: { id: manifest.id, name: manifest.name, version: manifest.version, shape: "content", dependencies: { core: "*" }, sections: manifest.sections },
+      files: { monster: contribution },
+    };
+    for (const enabled of [false, true]) {
+      const units = expandSections([core, mod], (_pack, sectionId) => sectionId === id && enabled);
+      const actual = composePacks(units.map((unit) => unit.content)).get("monster")!.get("core:death-mold")!.value;
+      expect(actual).toEqual({ ...baseline, hearing: enabled ? 2 : 200 });
+    }
   });
 });
 

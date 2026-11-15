@@ -20,8 +20,8 @@
  * ENTRY POINT CONTRACT
  * ------------------------------------------------------------------
  *
- * The default export is a mod API 2 definition. The mod reads no engine
- * member: `hooks` is handed its resolved rule flags and returns plain
+ * The default export is a mod API 2 definition. Startup uses the published
+ * menu registry; `hooks` is handed its resolved rule flags and returns plain
  * functions of plain data, so this file imports the SDK for TYPES ONLY. A
  * module fetched from a folder cannot resolve a bare specifier, and a bundled
  * copy of the SDK would only add a second copy of its module state.
@@ -39,13 +39,22 @@
  * stay as the specification the tests hold the game's behaviour to.
  */
 
-import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
-import { catchupEffectIntro, catchupMessageText, catchupObjectInfoText, catchupScreenText } from "./item-text";
+import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies, ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
+import { catchupCommandMenuText, catchupEffectIntro, catchupMessageText, catchupObjectInfoText, catchupScreenText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { CATCHUP_TILE_RULES } from "./tile-rules";
 
 export default {
   api: ">=2.0.0 <3.0.0",
+
+  start(mod: ModApi2): void {
+    if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;
+    const menus = mod.engine?.registry?.menus;
+    if (!menus) return;
+    const id = "core:keypress-command-table";
+    const previous = menus.handlerFor(id);
+    menus.register(id, (menu, rows) => catchupCommandMenuText(menu, previous?.(menu, rows) ?? rows));
+  },
 
   /*
    * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own

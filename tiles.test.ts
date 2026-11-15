@@ -420,15 +420,14 @@ describe("manifest.json", () => {
     expect(() => validateManifest(document)).not.toThrow();
   });
 
-  it("declares the schema 2 manifest on API 2 with the three registry grants its tables need", () => {
+  it("declares the schema 2 manifest on API 2 with table and menu-registry grants", () => {
     expect(document.format).toBe("neo-angband/mod/manifest");
     expect(document.schemaVersion).toBe(2);
     expect(document.data.runtime).toBe("in-process");
     expect(document.data.api).toBe(">=2.0.0 <3.0.0");
     expect(() => validateManifest(document)).not.toThrow();
-    /* The hooks need no permission; the three tables do (tileMap, the blast
-     * radius clamp, the restored-level tracking). */
-    expect([...(manifest.capabilities ?? [])].sort()).toEqual(["registry:monster", "registry:projection", "registry:tiles"]);
+    /* The menu label uses the published engine registry at startup. */
+    expect([...(manifest.capabilities ?? [])].sort()).toEqual(["engine:access", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("declares the flags the plugin reads, and defaults every one of them off", () => {

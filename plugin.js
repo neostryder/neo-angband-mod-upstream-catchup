@@ -21,6 +21,7 @@ var text_rules_default = {
     ["Entrance to Weapon Smith", "Entrance to Weapon Smiths"],
     ["Lights, Tools, Chests, etc", "Lights, Tools, Chests, etc."]
   ],
+  commandMenu: ["Disarm a trap or chest", "Disarm a trap/chest; lock door"],
   filterPrompt: [
     "Enter 2 or 3 (for stat) character code and return or return to clear ",
     "Enter 2-character code (3 for a stat) and Return, or just Return to clear "
@@ -82,6 +83,10 @@ function catchupScreenText(text, site) {
   }
   return text;
 }
+var catchupCommandMenuText = (id, rows) => {
+  if (id !== "core:keypress-command-table") return rows;
+  return rows.map((row) => row.semantic.kind === "keypress-command" && row.semantic.data?.["originalKey"] === "D" && row.label === text_rules_default.commandMenu[0] ? { ...row, label: text_rules_default.commandMenu[1] } : row);
+};
 
 // shape-flags.ts
 function learnShapeObviousFlagsDirectly() {
@@ -123,6 +128,14 @@ var CATCHUP_TILE_RULES = [
 // plugin.ts
 var plugin_default = {
   api: ">=2.0.0 <3.0.0",
+  start(mod) {
+    if (mod.meta.flags["catchup.text"] !== true || !mod.meta.granted("registry:menu")) return;
+    const menus = mod.engine?.registry?.menus;
+    if (!menus) return;
+    const id = "core:keypress-command-table";
+    const previous = menus.handlerFor(id);
+    menus.register(id, (menu, rows) => catchupCommandMenuText(menu, previous?.(menu, rows) ?? rows));
+  },
   /*
    * The BEHAVIOUR half of the mod. `hooks` is a factory over this mod's own
    * resolved flags, asked once when content composes, and it must be free of
