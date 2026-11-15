@@ -8,6 +8,6 @@ Settings that work as hooks (`catchup.projections`, `catchup.shapeFlags`, `catch
 | `catchup.projections` | off | Limits oversized blast radii to the supported projection range. | No |
 | `catchup.shapeFlags` | off | Learns a shapechange's obvious flags directly. | No |
 | `catchup.levelRevisitTracking` | off | Clears old noise and ages scent when revisiting a level. | No |
-| `catchup.completeRest` | off | Adds amnesia and scrambled stats to the effects a complete rest waits out. | No |
+| `catchup.completeRest` | off | A complete rest also waits out amnesia and scrambled stats. | No |
 | `catchup.text` | off | Corrects selected wording from later upstream releases. | Yes |
 | `catchup.deathMoldHearing` | off | Sets death mold hearing to 2 instead of 200. | Yes |

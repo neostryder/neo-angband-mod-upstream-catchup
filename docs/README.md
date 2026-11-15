@@ -20,7 +20,7 @@ switch has no flag of its own, the game knows it by its section id instead.
 | Post-4.2.6 projection corrections | `catchup.projections` | off | Corrections upstream made after 4.2.6 to how a spell, breath or wand blast is built. |
 | Post-4.2.6 shapechange flag learning | `catchup.shapeFlags` | off | A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). |
 | Post-4.2.6 restored-level tracking | `catchup.levelRevisitTracking` | off | When returning to a persistent level or leaving single combat, discard the old noise field and age the old scent trail by the world ticks spent away. |
-| Post-4.2.6 complete-rest effects | `catchup.completeRest` | off | A complete rest also waits for amnesia and scrambled stats to end (41319eef9). |
+| Rest out amnesia and scrambled stats | `catchup.completeRest` | off | A complete rest also waits out amnesia and scrambled stats (41319eef9). |
 | Post-4.2.6 text corrections | `catchup.text` | off | Wording upstream corrected after 4.2.6, cited to the upstream commit that made it. |
 | Post-4.2.6 death mold hearing | `catchup.deathMoldHearing` | off | Sets death mold hearing to 2 instead of 200. |
 

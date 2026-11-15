@@ -147,7 +147,7 @@ These entries use the API2-GAPS columns. Paths below are relative to Core. SDK 1
 | `f987eef82` | Bug Fixes | Clear interrupted-rest state before starting another rest. |
 | `727138d71` | Bug Fixes | Background rest continuations preserve the original repeat command. |
 | `d26e723bf` | Bug Fixes | Flush queued commands before deep descent changes level. |
-| `41319eef9` | Carry here | Complete-rest effects, including AMNESIA and SCRAMBLE, under catchup.completeRest through mod API 2.2.0; UC-12 is resolved. |
+| `41319eef9` | Carry here | Carried as `catchup.completeRest`, which supplies upstream's twelve complete-rest effects, including AMNESIA and SCRAMBLE, through the `completeRestEffects` policy in mod API 2.2.0 and resolves UC-12. |
 | `8c75bdccb` | Not applicable (Borg) | Borg: clear the reaction gate after a message batch |
 | `d90bdfcc7` | Not applicable (Borg) | Remove the internal tracking comment |
 | `42cd156ac` | Not applicable (Borg) | Borg: use the borg's dont_react field for the knockout gate |

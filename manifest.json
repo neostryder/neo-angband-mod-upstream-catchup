@@ -57,8 +57,8 @@
       },
       {
         "flag": "catchup.completeRest",
-        "title": "Post-4.2.6 complete-rest effects",
-        "description": "A complete rest also waits for amnesia and scrambled stats to end (upstream commit 41319eef9). It still waits for the ten effects checked by 4.2.6. Other rest modes are unchanged.",
+        "title": "Rest out amnesia and scrambled stats",
+        "description": "Rest as needed (R&) also waits for amnesia and scrambled stats to end, on top of the ten effects 4.2.6 checks (upstream commit 41319eef9). Other rest modes are unchanged.",
         "default": false
       },
       {
