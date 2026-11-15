@@ -10,12 +10,8 @@
  * WHAT BELONGS HERE, AND WHAT BELONGS TO `bug-fixes`
  * ------------------------------------------------------------------
  *
- * One question decides it: does an accepted upstream commit exist for this
- * change? Yes, and it is this mod's, cited by SHA. No, and it is the
- * `bug-fixes` mod's, cited by issue or by measurement. A fix that upstream
- * later accepts MOVES here at the next release, which is the point of the split
- * rather than an inconvenience: this set is finite and expires, and that one is
- * open-ended and permanent.
+ * Content, balance, and feature changes belong here, cited by upstream SHA.
+ * Bug fixes, including ambiguous commits, belong to `bug-fixes`.
  *
  * This mod deletes itself the day core rebaselines onto a newer upstream tag,
  * because everything in it will already be in the game.
@@ -44,7 +40,7 @@
  */
 
 import type { Api2HookContext, Api2Hooks, Api2ModDefinition, Api2Policies } from "@rpgm-tools/neo-angband-mod-sdk";
-import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
+import { catchupEffectIntro, catchupMessageText, catchupObjectInfoText, catchupScreenText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import { CATCHUP_TILE_RULES } from "./tile-rules";
 
@@ -79,6 +75,8 @@ export default {
     if (flags["catchup.text"] === true) {
       out.objectInfoText = catchupObjectInfoText;
       out.effectIntro = catchupEffectIntro;
+      out.messageText = catchupMessageText;
+      out.screenText = catchupScreenText;
     }
 
     return out;

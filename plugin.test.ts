@@ -32,9 +32,9 @@ describe("the API 2 definition", () => {
     expect(hooks.shapeLearnObviousFlagsDirectly?.()).toBe(true);
   });
 
-  it("gives the text rule its two hooks, and nothing else", () => {
+  it("gives the text rule its four hooks, and nothing else", () => {
     const hooks = hooksFor({ "catchup.text": true });
-    expect(Object.keys(hooks).sort()).toEqual(["effectIntro", "objectInfoText"]);
+    expect(Object.keys(hooks).sort()).toEqual(["effectIntro", "messageText", "objectInfoText", "screenText"]);
     const site = { section: "stats", tval: "ring", kind: "Speed", aware: true } as const;
     expect(hooks.objectInfoText?.("Affects your speed\n", site)).toBe(catchupObjectInfoText("Affects your speed\n"));
     expect(hooks.objectInfoText?.("Affects your speed\n", site)).toBe("Affects your speed.\n");

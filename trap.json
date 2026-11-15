@@ -1,0 +1,35 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:dart-trap--strength-loss-dart": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "A trap which shoots strength-draining darts."
+            ]
+          }
+        ],
+        "core:dart-trap--dexterity-loss-dart": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "A trap which shoots dexterity-draining darts."
+            ]
+          }
+        ],
+        "core:dart-trap--constitution-loss-dart": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "A trap which shoots constitution-draining darts."
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

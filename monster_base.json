@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:ainu": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "Ainu/Maia"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

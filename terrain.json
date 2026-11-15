@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:home": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "Your safe piece of Middle-earth, and the only place you can store goods",
+              " apart from on your person."
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

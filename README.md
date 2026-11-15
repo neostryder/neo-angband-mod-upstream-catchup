@@ -27,10 +27,9 @@ commit that made it.
 flowchart TD
   A["A proposed Angband change"] --> B{"Does it change text, data or behaviour?"}
   B -->|"No, build, CI or comments only"| X["No port needed"]
-  B -->|"Yes"| C{"Does an accepted upstream commit exist?"}
+  B -->|"Yes"| C{"Is it content, balance, or a feature?"}
   C -->|"Yes"| U["Upstream Catchup<br/>The row cites its SHA"]
-  C -->|"No"| F["Bug Fixes<br/>The row cites an issue or measurement"]
-  F -->|"Upstream later accepts the fix"| U
+  C -->|"Bug fix or ambiguous"| F["Bug Fixes<br/>The row cites an issue or measurement"]
   U --> T["One toggle per class<br/>catchup.tiles<br/>catchup.text<br/>catchup.projections<br/>catchup.shapeFlags<br/>catchup.levelRevisitTracking"]
   U --> R["The set expires at the next core rebaseline"]
   X -.-> E["ab2d65386 only deletes comments"]
@@ -38,21 +37,7 @@ flowchart TD
 
 *Source of truth: `README.md` for the mod boundary and `manifest.json` for the five toggles.*
 
-One question decides which mod a change belongs to:
-
-**Does an accepted upstream commit exist for this change?**
-
-- **Yes.** It belongs here, cited by SHA. This set is finite, mechanical, and
-  expires at the next rebaseline.
-- **No.** It belongs to
-  [bug-fixes](https://github.com/neostryder/neo-angband-mod-bug-fixes), cited by
-  issue or by measurement. That set is open-ended and permanent, and it is what a
-  player means by an unofficial patch.
-
-A fix that upstream later accepts MOVES from `bug-fixes` to here at the next
-release. That is why the split exists: if merged into one mod, the permanent
-patch set would be buried under the finite
-one's churn and neither could be reviewed on its own.
+Content, balance, and feature changes belong here, cited by upstream SHA. Bug fixes and ambiguous commits belong to [Bug Fixes](https://github.com/neostryder/neo-angband-mod-bug-fixes), including fixes accepted upstream. The existing carried rules remain listed below; the current review and routing decisions are in [the upstream ledger](docs/UPSTREAM.md).
 
 ## What is in it
 
@@ -63,10 +48,12 @@ See the [settings reference](SETTINGS.md) for every flag, its default, and when 
 | Toggle | What it covers | What it does |
 | --- | --- | --- |
 | **Post-4.2.6 tile assignments** (`catchup.tiles`) | 4 upstream commits, March 2026 | Pictures upstream assigned after 4.2.6 for creatures and items its tile sets were leaving as coloured letters. In every case the art was already in the sheet and only the line pointing at it was missing. Each block applies to the tile set upstream wrote it for and to no other, and only where that set assigns nothing already, so no picture anybody drew is replaced. None of it is visible in ASCII. |
-| **Post-4.2.6 text corrections** (`catchup.text`) | 5 upstream commits, December 2025 to July 2026 | Wording upstream corrected after the 4.2.6 tag. The Trident 'of Wrath' description spells the Maia's name "Ossë" instead of "Osse" (`f1b1626f6`). The Priest spell Light of Manwë is renamed Light of Varda, and the blessed property is blessed by the Valar instead of the gods (`780e326fd`). The Necromancer's Vampire Strike says exactly how many hitpoints it drains (`897ab3a3f`). In item descriptions, an "Affects your" line ends with a full stop (`ad5c8401a`), an effect you must aim opens with "It requires a target.", and wands, staffs, rods and activated items say "When used" (`4153ff6a6`). Only text changes: no damage, weight or slot. The item-description wording uses text hooks that Neo Angband 1.18.0 added, which is why this version of the mod needs 1.18.0 or newer. |
+| **Post-4.2.6 text corrections** (`catchup.text`) | 7 upstream commits, December 2025 to September 2026 | Wording upstream corrected after the 4.2.6 tag. The Trident 'of Wrath' description spells the Maia's name "Ossë" instead of "Osse" (`f1b1626f6`). The Priest spell Light of Manwë is renamed Light of Varda, and the blessed property is blessed by the Valar instead of the gods (`780e326fd`). The Necromancer's Vampire Strike says exactly how many hitpoints it drains (`897ab3a3f`). In item descriptions, an "Affects your" line ends with a full stop (`ad5c8401a`), an effect you must aim opens with "It requires a target.", and wands, staffs, rods and activated items say "When used" (`4153ff6a6`). Only text changes: no damage, weight or slot. The item-description wording uses text hooks that Neo Angband 1.18.0 added, which is why this version of the mod needs 1.18.0 or newer. |
 | **Post-4.2.6 projection corrections** (`catchup.projections`) | 1 upstream commit, July 2026 | Corrections to how a spell, breath or wand blast is built. Today: a blast radius larger than the game's maximum projection range is held at that maximum, so the blast cannot reach a distance its own damage table has no entry for (commit `f0f6bd223`, upstream issue [#6671](https://github.com/angband/angband/issues/6671)). A radius already within range is left exactly as it was, and 4.2.6's own spells, breaths and wands never ask for more - only another mod, or the debug command, reaches the case this covers. Needs the engine release that added the projection-radius seam; on an older engine the row is inert. |
 | **Post-4.2.6 shapechange flag learning** (`catchup.shapeFlags`) | 1 upstream commit, July 2026 | A correction to how taking on a shape teaches you what it grants. Today: a shape's obvious flags are learned directly, instead of only through whatever you have worn (commit `c8036c515`, raised in the comments on FAangband issue [#465](https://github.com/NickMcConnell/FAangband/issues/465)). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but the game never told you, because it only ever checked your equipment. This teaches exactly the same obvious flags the shape already reveals on assuming it, nothing broader. Needs the engine release that added the shape-flag-learning seam; on an older engine the row is inert. |
 | **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is separate from `bug-fixes`' in-play save/reload heatmap persistence, which keeps old tracking instead of discarding it. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
+
+The text section also carries the descriptions, messages, symbol help, and equipment-comparison wording from `73c851ab4` and `c6e499b5a`. Each content patch has a test against the installed Core string. The ledger lists the six spelling-only changes omitted to keep en_US spelling.
 
 Every toggle defaults to off, unlike in the `bug-fixes` mod. Core is 4.2.6, someone who installed the game did not ask for anything later than that, and a change arriving switched on would amount to the port adding something.
 
@@ -90,7 +77,7 @@ Every commit after 4.2.6 was checked one by one against this port. Of the 161 co
 | [`c8036c515`](https://github.com/angband/angband/commit/c8036c51537942a560e3d7f81749c431bbb4701f) | 2026-07-21 | Learn a shapechange's obvious flags directly, instead of only through worn equipment | n/a (`src/obj-knowledge.c`, not a tile) | Yes, under `catchup.shapeFlags` |
 | [`5c45eb958`](https://github.com/angband/angband/commit/5c45eb9588b8227d4f1b1998e0a627ad7ee11a75) | 2026-08-18 | Remembers the source for reload noise reconstruction, and clears stale noise / ages scent when a frozen level returns | n/a (`game-world.c`, `generate.c`, `load.c`, `save.c`, `ui-game.c`) | Yes, level-revisit half under `catchup.levelRevisitTracking`; its reload design remains separate from `bug-fixes` |
 
-The remaining commits have nothing for this mod to carry: build, CI and platform plumbing, comments and casts. The `bug-fixes` mod carries a text, data or behaviour correction only while upstream has not accepted a fix for it; once upstream does, the correction belongs here, cited by SHA. `f1b1626f6` above shipped briefly in `bug-fixes` 0.19.0 and moved here in 0.19.1/0.1.1 for that reason.
+The table above records the older carried set. The [upstream ledger](docs/UPSTREAM.md) records subsequent reviews, including the Bug Fixes and Borg routing lists.
 
 ### A known interaction with the `bug-fixes` mod
 

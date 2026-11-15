@@ -36,6 +36,7 @@ document](https://github.com/neostryder/neo-angband/blob/master/docs/modding/MOD
 ## Elsewhere
 
 - [README](../README.md), the full account
+- [Upstream ledger](UPSTREAM.md), reviewed commits and routing
 - [Changelog](../CHANGELOG.md), what changed in each version
 - [What belongs in this mod, and
   why](https://github.com/neostryder/neo-angband/blob/master/docs/modding/UPSTREAM_CATCHUP_MOD_SCOPE.md),

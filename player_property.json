@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "catchup-text": {
+      "fieldPatches": {
+        "core:slow-digestion": [
+          {
+            "op": "set",
+            "path": "desc",
+            "value": [
+              "You have a slow metabolism."
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
