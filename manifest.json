@@ -23,6 +23,7 @@
       "registry:projection",
       "registry:monster",
       "registry:menu",
+      "registry:command",
       "engine:access"
     ],
     "description": "Opt-in changes from upstream Angband development after 4.2.6, the tag this port is pinned to. Each kind of change has its own toggle and cites the upstream commit that made it. With everything off, core stays exactly 4.2.6.\n\nOnce core rebaselines onto a newer upstream tag, everything here is already in the game and the mod deletes itself.",
@@ -52,6 +53,12 @@
         "flag": "catchup.shapeFlags",
         "title": "Post-4.2.6 shapechange flag learning",
         "description": "A correction upstream made after 4.2.6 to how taking on a shape teaches you what it grants: a shape's obvious flags are now learned directly, instead of only through whatever you have worn (upstream commit c8036c515, raised in the comments on FAangband issue #465). Without it, a fox shapechange grants Free Action even when nothing you wear carries it, but you are never told, because the game only checked your equipment. This teaches you only the obvious flags the shape already reveals when you assume it. A resistance, or any other flag you would still have to experience in play to learn, stays hidden. Needs an engine release recent enough to support it; on an older engine this toggle does nothing.",
+        "default": false
+      },
+      {
+        "flag": "catchup.completeRest",
+        "title": "Post-4.2.6 complete-rest effects",
+        "description": "A complete rest also waits for amnesia and scrambled stats to end (upstream commit 41319eef9). It still waits for the ten effects checked by 4.2.6. Other rest modes are unchanged.",
         "default": false
       },
       {

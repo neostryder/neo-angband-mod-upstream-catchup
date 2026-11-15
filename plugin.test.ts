@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { api2PolicyEffects, apiRangeVerdict, checkApi2Policies, type Api2Hooks, type Api2Policies, type ModApi2 } from "@rpgm-tools/neo-angband-mod-sdk";
-import type { MenuTransformer, MenuTransformRow } from "@rpgm-tools/neo-angband-core";
+import { PLAYER_TIMED_ENTRIES, REST_ALL_POINTS, REST_COMPLETE, REST_SOME_POINTS, TMD, playerRestingCompleteMet, type GameState, type MenuTransformer, type MenuTransformRow } from "@rpgm-tools/neo-angband-core";
 import { catchupEffectIntro, catchupObjectInfoText } from "./item-text";
 import { learnShapeObviousFlagsDirectly } from "./shape-flags";
 import plugin from "./plugin";
 
-const RULES = ["catchup.tiles", "catchup.projections", "catchup.shapeFlags", "catchup.levelRevisitTracking", "catchup.text", "catchup.deathMoldHearing"] as const;
+const RULES = ["catchup.tiles", "catchup.projections", "catchup.shapeFlags", "catchup.levelRevisitTracking", "catchup.completeRest", "catchup.text", "catchup.deathMoldHearing"] as const;
 
 function hooksFor(flags: Readonly<Record<string, boolean>>): Api2Hooks {
   return plugin.hooks({ id: "upstream-catchup", flags }) ?? {};
@@ -73,7 +73,7 @@ describe("the API 2 definition", () => {
 
   it("asks for the table grants and the startup menu registry", () => {
     const manifest = JSON.parse(readFileSync(new URL("./manifest.json", import.meta.url), "utf8")) as { data: { capabilities: string[] } };
-    expect(manifest.data.capabilities.sort()).toEqual(["engine:access", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
+    expect(manifest.data.capabilities.sort()).toEqual(["engine:access", "registry:command", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("matches the manifest: every rule it names exists there with the same flag", () => {
@@ -83,6 +83,63 @@ describe("the API 2 definition", () => {
     const declared = new Set([...(manifest.data.rules ?? []), ...(manifest.data.sections ?? [])].map((t) => t.flag));
     for (const flag of RULES) expect(declared.has(flag)).toBe(true);
     expect(manifest.data.api).toBe(plugin.api);
+  });
+});
+
+describe("catchup.completeRest (upstream 41319eef9)", () => {
+  const baseline = ["BLIND", "CONFUSED", "POISONED", "AFRAID", "TERROR", "STUN", "CUT", "SLOW", "PARALYZED", "IMAGE"];
+  const upstream = [...baseline, "AMNESIA", "SCRAMBLE"];
+
+  function stateFor(flags: Readonly<Record<string, boolean>>): GameState {
+    return {
+      actor: { player: { chp: 100, mhp: 100, csp: 10, msp: 10, timed: new Array<number>(PLAYER_TIMED_ENTRIES.length).fill(0), wordRecall: 0, deepDescent: 0 } },
+      modHooks: api2PolicyEffects(policiesFor(flags)).hooks,
+    } as unknown as GameState;
+  }
+
+  it("declares exactly upstream's twelve names through the command policy", () => {
+    const policies = policiesFor({ "catchup.completeRest": true });
+    expect(Object.keys(policies)).toEqual(["completeRestEffects"]);
+    expect(checkApi2Policies(policies)).toBeNull();
+    expect([...(policies.completeRestEffects ?? [])].sort()).toEqual([...upstream].sort());
+    expect(hooksFor({ "catchup.completeRest": true })).toEqual({});
+    const manifest = JSON.parse(readFileSync(new URL("./manifest.json", import.meta.url), "utf8")) as { data: { rules: { flag: string; default: boolean }[]; capabilities: string[] } };
+    expect(manifest.data.rules.find((rule) => rule.flag === "catchup.completeRest")).toMatchObject({ default: false });
+    expect(manifest.data.capabilities).toContain("registry:command");
+  });
+
+  for (const [label, flags, expected] of [
+    ["on", { "catchup.completeRest": true }, upstream],
+    ["off", { "catchup.completeRest": false }, baseline],
+    ["absent", {}, baseline],
+  ] as const) {
+    it.each(PLAYER_TIMED_ENTRIES.map((entry, index) => ({ name: entry.name, index })))(`the ${label} rule waits for exactly its effects: $name`, ({ name, index }) => {
+      const state = stateFor(flags);
+      expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(true);
+      state.actor.player.timed[index] = 20;
+      expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(!expected.includes(name));
+      state.actor.player.timed[index] = 0;
+      expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(true);
+    });
+  }
+
+  it.each(["chp", "csp", "wordRecall", "deepDescent"] as const)("preserves the complete-rest %s check", (field) => {
+    const state = stateFor({ "catchup.completeRest": true });
+    state.actor.player[field] = field === "chp" || field === "csp" ? 0 : 1;
+    expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(false);
+  });
+
+  it("waits until both new effects expire and leaves the other rest modes alone", () => {
+    const state = stateFor({ "catchup.completeRest": true });
+    state.actor.player.timed[TMD.AMNESIA] = 20;
+    state.actor.player.timed[TMD.SCRAMBLE] = 30;
+    expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(false);
+    expect(playerRestingCompleteMet(state, REST_ALL_POINTS)).toBe(true);
+    expect(playerRestingCompleteMet(state, REST_SOME_POINTS)).toBe(true);
+    state.actor.player.timed[TMD.AMNESIA] = 0;
+    expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(false);
+    state.actor.player.timed[TMD.SCRAMBLE] = 0;
+    expect(playerRestingCompleteMet(state, REST_COMPLETE)).toBe(true);
   });
 });
 

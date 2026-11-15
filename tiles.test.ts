@@ -427,7 +427,7 @@ describe("manifest.json", () => {
     expect(document.data.api).toBe(">=2.2.0 <3.0.0");
     expect(() => validateManifest(document)).not.toThrow();
     /* The menu label uses the published engine registry at startup. */
-    expect([...(manifest.capabilities ?? [])].sort()).toEqual(["engine:access", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
+    expect([...(manifest.capabilities ?? [])].sort()).toEqual(["engine:access", "registry:command", "registry:menu", "registry:monster", "registry:projection", "registry:tiles"]);
   });
 
   it("declares the flags the plugin reads, and defaults every one of them off", () => {
@@ -435,6 +435,7 @@ describe("manifest.json", () => {
       "catchup.tiles",
       "catchup.projections",
       "catchup.shapeFlags",
+      "catchup.completeRest",
       "catchup.levelRevisitTracking",
     ]);
     for (const rule of manifest.rules) expect(rule.default, rule.flag).toBe(false);

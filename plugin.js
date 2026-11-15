@@ -163,7 +163,11 @@ var plugin_default = {
     return {
       ...flags["catchup.tiles"] === true ? { tileMap: CATCHUP_TILE_RULES } : {},
       ...flags["catchup.projections"] === true ? { projectionRadiusClamp: true } : {},
-      ...flags["catchup.levelRevisitTracking"] === true ? { levelRevisitTracking: true } : {}
+      ...flags["catchup.levelRevisitTracking"] === true ? { levelRevisitTracking: true } : {},
+      /* player_timed_continues_rest() uses these COMPLETE_REST effects in upstream 41319eef9. */
+      ...flags["catchup.completeRest"] === true ? {
+        completeRestEffects: ["SLOW", "BLIND", "PARALYZED", "CONFUSED", "AFRAID", "IMAGE", "POISONED", "CUT", "STUN", "AMNESIA", "TERROR", "SCRAMBLE"]
+      } : {}
     };
   }
 };

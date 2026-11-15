@@ -32,9 +32,10 @@
  * absent: the game takes its faithful path and the Mods screen does not list
  * this mod as touching that behaviour.
  *
- * THREE RULES ARE DECLARATIONS THE GAME APPLIES. Tile assignments by sheet
- * cell, the blast radius clamp and the restored-level tracking are policy
- * tables (`tileMap`, `projectionRadiusClamp`, `levelRevisitTracking`), returned
+ * FOUR RULES ARE DECLARATIONS THE GAME APPLIES. Tile assignments by sheet
+ * cell, the blast radius clamp, restored-level tracking, and complete-rest
+ * effects are policy tables (`tileMap`, `projectionRadiusClamp`,
+ * `levelRevisitTracking`, `completeRestEffects`), returned
  * from `policies` while their toggles are on. The game does the work: the mod
  * never touches a tile, a blast or a level. tiles.ts, radius.ts and tracking.ts
  * stay as the specification the tests hold the game's behaviour to.
@@ -102,6 +103,10 @@ export default {
       ...(flags["catchup.tiles"] === true ? { tileMap: CATCHUP_TILE_RULES } : {}),
       ...(flags["catchup.projections"] === true ? { projectionRadiusClamp: true } : {}),
       ...(flags["catchup.levelRevisitTracking"] === true ? { levelRevisitTracking: true } : {}),
+      /* player_timed_continues_rest() uses these COMPLETE_REST effects in upstream 41319eef9. */
+      ...(flags["catchup.completeRest"] === true ? {
+        completeRestEffects: ["SLOW", "BLIND", "PARALYZED", "CONFUSED", "AFRAID", "IMAGE", "POISONED", "CUT", "STUN", "AMNESIA", "TERROR", "SCRAMBLE"],
+      } : {}),
     };
   },
 } satisfies Api2ModDefinition;

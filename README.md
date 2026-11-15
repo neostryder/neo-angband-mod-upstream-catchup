@@ -30,12 +30,12 @@ flowchart TD
   B -->|"Yes"| C{"Is it content, balance, or a feature?"}
   C -->|"Yes"| U["Upstream Catchup<br/>The row cites its SHA"]
   C -->|"Bug fix or ambiguous"| F["Bug Fixes<br/>The row cites an issue or measurement"]
-  U --> T["One toggle per class<br/>catchup.tiles<br/>catchup.text<br/>catchup.projections<br/>catchup.shapeFlags<br/>catchup.levelRevisitTracking<br/>catchup.deathMoldHearing"]
+  U --> T["One toggle per class<br/>catchup.tiles<br/>catchup.text<br/>catchup.projections<br/>catchup.shapeFlags<br/>catchup.levelRevisitTracking<br/>catchup.deathMoldHearing<br/>catchup.completeRest"]
   U --> R["The set expires at the next core rebaseline"]
   X -.-> E["ab2d65386 only deletes comments"]
 ```
 
-*Source of truth: `README.md` for the mod boundary and `manifest.json` for the six toggles.*
+*Source of truth: `README.md` for the mod boundary and `manifest.json` for the seven toggles.*
 
 This mod carries content, balance, and feature changes from upstream, each cited by its upstream SHA. Bug fixes go to [Bug Fixes](https://github.com/neostryder/neo-angband-mod-bug-fixes), including fixes upstream has accepted and commits whose class is unclear. The rules this mod already carries are listed below, and [the upstream ledger](docs/UPSTREAM.md) has the current review and where each commit goes.
 
@@ -53,6 +53,7 @@ See the [settings reference](SETTINGS.md) for every flag, its default, and when 
 | **Post-4.2.6 shapechange flag learning** (`catchup.shapeFlags`) | 1 upstream commit, July 2026 | A correction to how taking on a shape teaches you what it grants. Today: a shape's obvious flags are learned directly, instead of only through whatever you have worn (commit `c8036c515`, raised in the comments on FAangband issue [#465](https://github.com/NickMcConnell/FAangband/issues/465)). Without it, a fox shapechange grants Free Action and nothing worn needs to carry it - but the game never told you, because it only ever checked your equipment. This teaches exactly the same obvious flags the shape already reveals on assuming it, nothing broader. Needs the engine release that added the shape-flag-learning seam; on an older engine the row is inert. |
 | **Post-4.2.6 restored-level tracking** (`catchup.levelRevisitTracking`) | 1 upstream commit, August 2026 | On return from a persistent-level trip or single combat, old noise is cleared and scent is aged by elapsed world ticks (commit `5c45eb958`, upstream issue [#4605](https://github.com/angband/angband/issues/4605)). Fresh tracking is made by the next world tick. This is separate from `bug-fixes`' in-play save/reload heatmap persistence, which keeps old tracking instead of discarding it. Needs the engine release that added the level-revisited seam; on an older engine the row is inert. |
 | **Post-4.2.6 death mold hearing** (`catchup.deathMoldHearing`) | 1 upstream commit, August 2026 | Sets death mold hearing to 2 instead of 200 (`5da31305a`), without that commit's noise-propagation optimization. |
+| **Post-4.2.6 complete-rest effects** (`catchup.completeRest`) | 1 upstream commit, November 2026 | A complete rest also waits for amnesia and scrambled stats to end (`41319eef9`). The `completeRestEffects` policy supplies upstream's twelve effect names through mod API 2.2.0. With the toggle off, Core keeps 4.2.6's ten effects. |
 
 The `catchup.text` toggle also carries description, message, symbol help, and equipment-comparison wording from `73c851ab4` and `c6e499b5a`, and it relabels the disarm command to mention locking doors (`43ae88cd9`). Six spelling-only upstream changes are left out to keep en_US spelling, and [the upstream ledger](docs/UPSTREAM.md) lists them.
 
@@ -219,7 +220,7 @@ This mod flags a character's save permanently once it is enabled, so a character
 
 Tile assignments and text corrections change no rule, die roll or level. The blast-radius clamp changes a blast only when the radius asked for is already larger than the maximum projection range, and nothing 4.2.6 ships asks for that: spells, breaths, wands and traps all stay within the range, and the arc path caps itself at the range before the clamp is ever consulted. With this mod alone, then, the clamp never fires, which is also why upstream classes the bug as reachable only from a modded game or the debug command.
 
-Two rows do alter rules a player can reach: `catchup.shapeFlags` has a shapechange teach its obvious flags directly, and `catchup.levelRevisitTracking` clears noise and ages scent when you return to a frozen level, which changes what monsters can follow. A mod that changes gameplay flags the save permanently, and `manifest.json` declares `"affectsGameplay": true`.
+The `catchup.shapeFlags` rule has a shapechange teach its obvious flags directly, `catchup.levelRevisitTracking` clears noise and ages scent when you return to a frozen level, and `catchup.completeRest` waits out amnesia and scrambled stats during a complete rest. A mod that changes gameplay flags the save permanently, and `manifest.json` declares `"affectsGameplay": true`.
 
 ## Releasing
 
