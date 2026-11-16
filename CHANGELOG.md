@@ -24,6 +24,14 @@ were not retagged.
 
 ## [Unreleased]
 
+### Added
+
+- [Visible] [Balance] **Death molds can use the corrected hearing range.** The new setting Post-4.2.6 death mold hearing gives death molds a hearing range of 2 instead of 200, as upstream corrected after 4.2.6. It is off by default (upstream commit 5da31305a).
+
+### Changed
+
+- [Visible] [UI] **The upstream wording setting carries more corrections.** Trap descriptions name the stat each dart trap drains, the Home has a rewritten description, "can not" becomes "cannot" in descriptions, messages, symbol help, and equipment comparisons, and the disarm command's label mentions locking doors. The disarm label needs a game build with the command menu registry, and the other corrections work as before (upstream commit 73c851ab4, c6e499b5a, and 43ae88cd9).
+
 ## 1.3.0-beta.2 - 2026-10-30
 
 ### Changed
